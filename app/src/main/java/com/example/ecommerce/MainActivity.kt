@@ -1,39 +1,39 @@
 package com.example.ecommerce
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import com.example.ecommerce.ui.MainViewModel
+import com.example.ecommerce.viewModels.MainViewModel
+import com.example.ecommerce.views.auth.LoginActivity
+import com.example.ecommerce.views.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
+
 class MainActivity : AppCompatActivity() {
-    private lateinit var navController: NavController
-    private val viewModel: MainViewModel by viewModels()
+    private val vm: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-
         observeAuthState()
     }
 
     private fun observeAuthState() {
-        viewModel.isLoggedIn.observe(this) { isLoggedIn ->
+        vm.isLoggedIn.observe(this) { isLoggedIn ->
             if (isLoggedIn) {
-                // If user is logged in and we're at the start destination, navigate to home
-                if (navController.currentDestination?.id == R.id.loginFragment) {
-                    navController.navigate(R.id.action_loginFragment_to_homeFragment)
-                }
+                val intent = Intent(this, HomeActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+            } else {
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
             }
+            finish()
         }
     }
 }

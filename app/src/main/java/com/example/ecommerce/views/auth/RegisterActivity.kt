@@ -1,36 +1,27 @@
-package com.example.ecommerce.ui.auth
+package com.example.ecommerce.views.auth
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.example.ecommerce.R
-import com.example.ecommerce.databinding.FragmentRegisterBinding
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import com.example.ecommerce.databinding.ActivityRegisterBinding
+import com.example.ecommerce.viewModels.RegisterState
+import com.example.ecommerce.viewModels.RegisterViewModel
+import com.example.ecommerce.views.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RegisterFragment : Fragment() {
+class RegisterActivity : AppCompatActivity() {
 
-    private var _binding: FragmentRegisterBinding? = null
-    private val binding get() = _binding!!
-
+    private lateinit var binding: ActivityRegisterBinding
     private val viewModel: RegisterViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         setupListeners()
         observeViewModel()
@@ -45,12 +36,12 @@ class RegisterFragment : Fragment() {
         }
 
         binding.tvLoginPrompt.setOnClickListener {
-            findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
+            finish()
         }
     }
 
     private fun observeViewModel() {
-        viewModel.registerState.observe(viewLifecycleOwner) { state ->
+        viewModel.registerState.observe(this) { state ->
             when (state) {
                 is RegisterState.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
@@ -59,19 +50,17 @@ class RegisterFragment : Fragment() {
                 is RegisterState.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnRegister.isEnabled = true
-                    findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                    val intent = Intent(this, HomeActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
                 }
                 is RegisterState.Error -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnRegister.isEnabled = true
-                    Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
