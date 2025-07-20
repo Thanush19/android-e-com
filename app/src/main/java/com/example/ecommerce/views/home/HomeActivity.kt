@@ -4,7 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.example.ecommerce.R
 import com.example.ecommerce.databinding.ActivityHomeBinding
+import com.example.ecommerce.viewModels.HomeViewModel
 import com.example.ecommerce.views.auth.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,25 +22,32 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupListeners()
-        observeViewModel()
-    }
+        setupBottomNavigation()
 
-    private fun setupListeners() {
-        binding.btnLogout.setOnClickListener {
-            viewModel.logout()
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+        if (savedInstanceState == null) {
+            loadFragment(MyFeedFragment.newInstance())
         }
     }
 
-    private fun observeViewModel() {
-        viewModel.currentUser.observe(this) { user ->
-            if (user != null) {
-                binding.tvUserInfo.text = "Welcome, ${user.userName}!"
+    private fun setupBottomNavigation() {
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_feed -> {
+                    loadFragment(MyFeedFragment.newInstance())
+                    return@setOnItemSelectedListener true
+                }
+                R.id.navigation_profile -> {
+                    loadFragment(MyProfileFragment.newInstance())
+                    return@setOnItemSelectedListener true
+                }
+                else -> false
             }
         }
+    }
+
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .commit()
     }
 }

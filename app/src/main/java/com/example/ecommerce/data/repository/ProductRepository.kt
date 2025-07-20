@@ -29,6 +29,4 @@ class ProductRepository(private val productApiService: ProductApiService) {
         }
         return@withContext null
     }
-
-
 }

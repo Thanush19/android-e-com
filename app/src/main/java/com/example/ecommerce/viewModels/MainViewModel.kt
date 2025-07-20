@@ -41,7 +41,7 @@ class LoginViewModel @Inject constructor(
 
     fun login(username: String, password: String) {
         if (username.isBlank() || password.isBlank()) {
-            _loginState.value = LoginState.Error("Username and password cannot be empty")
+            _loginState.value = LoginState.Error("Username and pw cant be empty")
             return
         }
 
@@ -53,7 +53,7 @@ class LoginViewModel @Inject constructor(
                     userPreferencesRepository.saveUserId(user.id)
                     _loginState.value = LoginState.Success
                 } else {
-                    _loginState.value = LoginState.Error("Invalid username or password")
+                    _loginState.value = LoginState.Error("Invalid username or pw")
                 }
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error("Login failed: ${e.message}")
