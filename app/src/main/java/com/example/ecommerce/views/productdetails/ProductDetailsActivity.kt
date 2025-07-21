@@ -63,7 +63,7 @@ class ProductDetailsActivity : AppCompatActivity() {
                 binding.tvProductPrice.text = "Rs.${product.price}"
                 binding.tvProductDescription.text = product.description
                 binding.tvProductCategory.text = "Category: ${product.category}"
-                binding.tvProductRating.text = "Rating: ${product.rating.rate} (${product.rating.count} reviews)"
+                binding.tvProductRating.text = "Rating: ${product.rating.rate} stars (${product.rating.count} reviews)"
                 binding.ivProductImage.load(product.image) {
                     crossfade(true)
                     placeholder(android.R.drawable.ic_menu_gallery)

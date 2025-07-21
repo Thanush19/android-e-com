@@ -29,13 +29,7 @@ class ProductAdapter : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() 
     override fun getItemCount(): Int = products.size
 
     fun updateProducts(newProducts: List<Product>) {
-        products.clear()
         products.addAll(newProducts)
-        notifyDataSetChanged()
-    }
-
-    fun submitList(newProducts: List<Product>) {
-        updateProducts(newProducts)
     }
 
     class ProductViewHolder(

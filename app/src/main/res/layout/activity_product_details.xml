@@ -9,7 +9,8 @@
     <ImageView
         android:id="@+id/ivProductImage"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_marginTop="50dp"
+        android:layout_height="400dp"
         android:scaleType="centerCrop"
         android:contentDescription="Product Image" />
 
@@ -26,7 +27,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:textColor="#FF0000"
+        android:textColor="#000000"
+        android:textFontWeight="@integer/material_motion_duration_medium_2"
         android:layout_marginTop="8dp" />
 
     <TextView
@@ -43,21 +45,19 @@
         android:textSize="16sp"
         android:layout_marginTop="8dp" />
 
-    <!-- Product Description -->
     <TextView
         android:id="@+id/tvProductDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:textStyle="italic"
         android:layout_marginTop="8dp" />
 
-    <!-- Spacer to push buttons to bottom -->
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

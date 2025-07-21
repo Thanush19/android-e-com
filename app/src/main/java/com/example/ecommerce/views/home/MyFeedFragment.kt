@@ -47,14 +47,14 @@ class MyFeedFragment : Fragment() {
         }
 
         binding.rvProducts.apply {
-            layoutManager = GridLayoutManager(requireContext(), 2)
+            layoutManager = GridLayoutManager(requireContext(), 1)
             adapter = productAdapter
         }
     }
 
     private fun observeViewModel() {
         viewModel.products.observe(viewLifecycleOwner) { products ->
-            productAdapter.submitList(products)
+            productAdapter.updateProducts(products)
             horizontalProductAdapter.submitList(products)
         }
 
