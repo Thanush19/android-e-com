@@ -21,7 +21,7 @@ class MyFeedFragment : Fragment() {
     private var _binding: FragmentMyFeedBinding? = null
     private val binding get() = _binding!!
     private val viewModel: HomeViewModel by activityViewModels()
-    private val productAdapter by lazy { ProductAdapter() }
+    private lateinit var productAdapter: ProductAdapter
     private val horizontalProductAdapter by lazy { HorizontalProductAdapter() }
 
     override fun onCreateView(
@@ -44,6 +44,9 @@ class MyFeedFragment : Fragment() {
         binding.rvHorizontalProducts.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = horizontalProductAdapter
+        }
+
+        productAdapter = ProductAdapter { page ->
         }
 
         binding.rvProducts.apply {
