@@ -3,9 +3,11 @@ package com.example.ecommerce.data.db.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.example.ecommerce.data.db.converters.Converters
 
 @Entity(
-    tableName = "carts",
+    tableName = "orders",
     foreignKeys = [
         ForeignKey(
             entity = User::class,
@@ -15,9 +17,11 @@ import androidx.room.PrimaryKey
         )
     ]
 )
-data class Cart(
+
+@TypeConverters(Converters::class)
+data class Order(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val userId: Long,
-    val productIds: String = ""
+    val productIds: List<Int>
 )

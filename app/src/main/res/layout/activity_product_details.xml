@@ -1,0 +1,82 @@
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Product Image -->
+    <ImageView
+        android:id="@+id/ivProductImage"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Product Image" />
+
+    <!-- Product Title -->
+    <TextView
+        android:id="@+id/tvProductTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp" />
+
+    <!-- Product Price -->
+    <TextView
+        android:id="@+id/tvProductPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="#FF0000"
+        android:layout_marginTop="8dp" />
+
+    <!-- Product Category -->
+    <TextView
+        android:id="@+id/tvProductCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp" />
+
+    <!-- Product Rating -->
+    <TextView
+        android:id="@+id/tvProductRating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp" />
+
+    <!-- Product Description -->
+    <TextView
+        android:id="@+id/tvProductDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp" />
+
+    <!-- Spacer to push buttons to bottom -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/btnBuyNow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Buy Now"
+            android:layout_marginEnd="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

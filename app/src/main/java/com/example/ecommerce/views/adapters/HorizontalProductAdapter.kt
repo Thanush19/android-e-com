@@ -1,20 +1,17 @@
 package com.example.ecommerce.views.adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.ecommerce.data.model.Product
 import com.example.ecommerce.databinding.ItemProductHorizontalBinding
+import com.example.ecommerce.views.home.ProductDetailsActivity
 
 class HorizontalProductAdapter : RecyclerView.Adapter<HorizontalProductAdapter.ProductViewHolder>() {
 
     private val products: MutableList<Product> = mutableListOf()
-    private var onProductClick: ((Product) -> Unit)? = null
-
-    fun setOnProductClickListener(listener: (Product) -> Unit) {
-        onProductClick = listener
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val binding = ItemProductHorizontalBinding.inflate(
@@ -22,7 +19,7 @@ class HorizontalProductAdapter : RecyclerView.Adapter<HorizontalProductAdapter.P
             parent,
             false
         )
-        return ProductViewHolder(binding, onProductClick)
+        return ProductViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
@@ -37,9 +34,12 @@ class HorizontalProductAdapter : RecyclerView.Adapter<HorizontalProductAdapter.P
         notifyDataSetChanged()
     }
 
+    fun submitList(newProducts: List<Product>) {
+        updateProducts(newProducts)
+    }
+
     class ProductViewHolder(
-        private val binding: ItemProductHorizontalBinding,
-        private val onProductClick: ((Product) -> Unit)?
+        private val binding: ItemProductHorizontalBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product) {
@@ -51,7 +51,11 @@ class HorizontalProductAdapter : RecyclerView.Adapter<HorizontalProductAdapter.P
                 error(android.R.drawable.ic_menu_report_image)
             }
             binding.root.setOnClickListener {
-                onProductClick?.invoke(product)
+                val context = binding.root.context
+                val intent = Intent(context, ProductDetailsActivity::class.java).apply {
+                    putExtra("PRODUCT_ID", product.id)
+                }
+                context.startActivity(intent)
             }
         }
     }

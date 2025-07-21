@@ -13,14 +13,16 @@ import com.example.ecommerce.databinding.FragmentMyFeedBinding
 import com.example.ecommerce.viewModels.HomeViewModel
 import com.example.ecommerce.views.adapters.HorizontalProductAdapter
 import com.example.ecommerce.views.adapters.ProductAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MyFeedFragment : Fragment() {
 
     private var _binding: FragmentMyFeedBinding? = null
     private val binding get() = _binding!!
-    private val vm: HomeViewModel by activityViewModels()
-    private val productAdapter by lazy { ProductAdapter().apply { setOnProductClickListener { showToast(it.title) } }  }
-    private val horizontalProductAdapter by lazy { HorizontalProductAdapter().apply { setOnProductClickListener { showToast(it.title) } } }
+    private val viewModel: HomeViewModel by activityViewModels()
+    private val productAdapter by lazy { ProductAdapter() }
+    private val horizontalProductAdapter by lazy { HorizontalProductAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +35,7 @@ class MyFeedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.btnSeeMore.visibility = View.GONE
         setupRecyclerViews()
         observeViewModel()
     }
@@ -50,18 +53,16 @@ class MyFeedFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        vm.products.observe(viewLifecycleOwner) { products ->
-            productAdapter.updateProducts(products)
-            horizontalProductAdapter.updateProducts(products)
+        viewModel.products.observe(viewLifecycleOwner) { products ->
+            productAdapter.submitList(products)
+            horizontalProductAdapter.submitList(products)
         }
 
-        vm.error.observe(viewLifecycleOwner) { errorMessage ->
-            errorMessage?.let { showToast(it) }
+        viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+            }
         }
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(requireContext(), "Selected: $message", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

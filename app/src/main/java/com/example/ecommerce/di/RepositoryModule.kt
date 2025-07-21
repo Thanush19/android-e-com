@@ -1,9 +1,9 @@
 package com.example.ecommerce.di
 
 import com.example.ecommerce.data.api.ProductApiService
-import com.example.ecommerce.data.db.dao.CartDao
+import com.example.ecommerce.data.db.dao.OrdersDao
 import com.example.ecommerce.data.db.dao.UserDao
-import com.example.ecommerce.data.repository.CartRepository
+import com.example.ecommerce.data.repository.OrdersRepository
 import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.data.repository.UserRepository
 import dagger.Module
@@ -24,8 +24,8 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideCartRepository(cartDao: CartDao): CartRepository {
-        return CartRepository(cartDao)
+    fun provideOrderstRepository(ordersDao: OrdersDao): OrdersRepository {
+        return OrdersRepository(ordersDao)
     }
 
     @Provides

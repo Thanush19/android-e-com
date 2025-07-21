@@ -3,7 +3,7 @@ package com.example.ecommerce.di
 import android.content.Context
 import androidx.room.Room
 import com.example.ecommerce.data.db.LocalDB
-import com.example.ecommerce.data.db.dao.CartDao
+import com.example.ecommerce.data.db.dao.OrdersDao
 import com.example.ecommerce.data.db.dao.UserDao
 import dagger.Module
 import dagger.Provides
@@ -32,7 +32,7 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideCartDao(database: LocalDB): CartDao {
-        return database.cartDao()
+    fun provideOrdersDao(database: LocalDB): OrdersDao {
+        return database.ordersDao()
     }
 }
