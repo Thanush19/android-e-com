@@ -36,10 +36,6 @@ class MyProfileFragment : Fragment() {
             }
         }
 
-        binding.tvMyCart.setOnClickListener {
-            Toast.makeText(context, "My Cart clicked", Toast.LENGTH_SHORT).show()
-        }
-
         binding.tvMyOrders.setOnClickListener {
             Toast.makeText(context, "Orders clicked", Toast.LENGTH_SHORT).show()
         }
