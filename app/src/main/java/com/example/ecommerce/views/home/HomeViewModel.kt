@@ -1,4 +1,4 @@
-package com.example.ecommerce.viewModels
+package com.example.ecommerce.views.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

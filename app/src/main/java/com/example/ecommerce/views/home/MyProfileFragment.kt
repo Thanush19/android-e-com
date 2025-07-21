@@ -1,6 +1,5 @@
 package com.example.ecommerce.views.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.ecommerce.R
 import com.example.ecommerce.data.repository.OrdersRepository
 import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.databinding.FragmentMyProfileBinding
-import com.example.ecommerce.viewModels.HomeViewModel
 import com.example.ecommerce.views.adapters.OrderDropdownAdapter
-import com.example.ecommerce.views.auth.LoginActivity
+import com.example.ecommerce.views.auth.LoginFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -50,10 +49,8 @@ class MyProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize adapter
         orderDropdownAdapter = OrderDropdownAdapter()
 
-        // Observe current user
         vm.currentUser.observe(viewLifecycleOwner) { user ->
             if (user != null) {
                 binding.tvProfileGreeting.text = "Hi, ${user.userName}"
@@ -62,7 +59,6 @@ class MyProfileFragment : Fragment() {
             }
         }
 
-        // Orders button click
         binding.tvMyOrders.setOnClickListener {
             vm.currentUser.value?.let { user ->
                 lifecycleScope.launch {
@@ -71,8 +67,6 @@ class MyProfileFragment : Fragment() {
                         Toast.makeText(context, "No orders found", Toast.LENGTH_SHORT).show()
                         return@launch
                     }
-
-                    // Fetch product details
                     val productIds = orders.flatMap { it.productIds }.distinct()
                     val products = mutableListOf<com.example.ecommerce.data.model.Product>()
                     for (productId in productIds) {
@@ -85,8 +79,6 @@ class MyProfileFragment : Fragment() {
                         Toast.makeText(context, "No product details available", Toast.LENGTH_SHORT).show()
                         return@launch
                     }
-
-                    // Show dropdown
                     showOrdersDropdown(products)
                 }
             } ?: run {
@@ -94,28 +86,24 @@ class MyProfileFragment : Fragment() {
             }
         }
 
-        // Logout button
         binding.tvLogout.setOnClickListener {
             vm.logout()
-            val intent = Intent(requireContext(), LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            requireActivity().finish()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, LoginFragment())
+                .addToBackStack(null)
+                .commit()
         }
     }
 
     private fun showOrdersDropdown(products: List<com.example.ecommerce.data.model.Product>) {
-        // Dismiss existing popup
         popupWindow?.dismiss()
 
-        // Create RecyclerView for dropdown
         val recyclerView = androidx.recyclerview.widget.RecyclerView(requireContext()).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = orderDropdownAdapter
         }
         orderDropdownAdapter.submitList(products)
 
-        // Create PopupWindow
         popupWindow = PopupWindow(
             recyclerView,
             ViewGroup.LayoutParams.WRAP_CONTENT,

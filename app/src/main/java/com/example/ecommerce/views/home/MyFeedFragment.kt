@@ -10,10 +10,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
-import com.example.ecommerce.viewModels.HomeViewModel
 import com.example.ecommerce.views.adapters.HorizontalProductAdapter
 import com.example.ecommerce.views.adapters.ProductAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.getValue
 
 @AndroidEntryPoint
 class MyFeedFragment : Fragment() {
@@ -58,7 +58,7 @@ class MyFeedFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.products.observe(viewLifecycleOwner) { products ->
             productAdapter.updateProducts(products)
-            horizontalProductAdapter.submitList(products)
+            horizontalProductAdapter.updateProducts(products)
         }
 
         viewModel.error.observe(viewLifecycleOwner) { errorMessage ->

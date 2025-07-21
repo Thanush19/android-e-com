@@ -7,8 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.ecommerce.R
 import com.example.ecommerce.databinding.ActivityHomeBinding
-import com.example.ecommerce.viewModels.HomeViewModel
-import com.example.ecommerce.views.auth.LoginActivity
+
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -34,10 +34,6 @@ class HorizontalProductAdapter : RecyclerView.Adapter<HorizontalProductAdapter.P
         notifyDataSetChanged()
     }
 
-    fun submitList(newProducts: List<Product>) {
-        updateProducts(newProducts)
-    }
-
     class ProductViewHolder(
         private val binding: ItemProductHorizontalBinding
     ) : RecyclerView.ViewHolder(binding.root) {

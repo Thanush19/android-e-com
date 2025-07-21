@@ -2,27 +2,35 @@ package com.example.ecommerce.views.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import com.example.ecommerce.databinding.ActivityRegisterBinding
-import com.example.ecommerce.viewModels.RegisterState
-import com.example.ecommerce.viewModels.RegisterViewModel
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import com.example.ecommerce.databinding.FragmentRegisterBinding
+import com.example.ecommerce.views.auth.RegisterState
+import com.example.ecommerce.views.auth.RegisterViewModel
 import com.example.ecommerce.views.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RegisterActivity : AppCompatActivity() {
+class RegisterFragment : Fragment() {
 
-    private lateinit var binding: ActivityRegisterBinding
+    private var _binding: FragmentRegisterBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: RegisterViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityRegisterBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupListeners()
         observeViewModel()
     }
@@ -36,12 +44,13 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         binding.tvLoginPrompt.setOnClickListener {
-            finish()
+            // Navigate back to LoginFragment
+            parentFragmentManager.popBackStack()
         }
     }
 
     private fun observeViewModel() {
-        viewModel.registerState.observe(this) { state ->
+        viewModel.registerState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is RegisterState.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
@@ -50,17 +59,23 @@ class RegisterActivity : AppCompatActivity() {
                 is RegisterState.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnRegister.isEnabled = true
-                    val intent = Intent(this, HomeActivity::class.java)
+                    val intent = Intent(requireContext(), HomeActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
-                    finish()
+                    requireActivity().finish()
                 }
                 is RegisterState.Error -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnRegister.isEnabled = true
-                    Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
+
