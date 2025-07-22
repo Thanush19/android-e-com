@@ -9,8 +9,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.ecommerce.databinding.FragmentRegisterBinding
-import com.example.ecommerce.views.auth.RegisterState
-import com.example.ecommerce.views.auth.RegisterViewModel
 import com.example.ecommerce.views.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,7 +42,6 @@ class RegisterFragment : Fragment() {
         }
 
         binding.tvLoginPrompt.setOnClickListener {
-            // Navigate back to LoginFragment
             parentFragmentManager.popBackStack()
         }
     }

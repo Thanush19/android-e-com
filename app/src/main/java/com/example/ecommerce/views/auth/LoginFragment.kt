@@ -8,21 +8,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.ecommerce.R
-import com.example.ecommerce.data.preferences.UserPreferencesRepository
-import com.example.ecommerce.data.repository.UserRepository
 import com.example.ecommerce.databinding.FragmentLoginBinding
-import com.example.ecommerce.views.auth.LoginState
-import com.example.ecommerce.views.auth.LoginViewModel
 import com.example.ecommerce.views.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {

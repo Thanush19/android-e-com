@@ -1,18 +1,14 @@
-
-
-
 package com.example.ecommerce.views.adapters
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.example.ecommerce.R
 import com.example.ecommerce.data.model.Product
 import com.example.ecommerce.databinding.ItemProductBinding
 import com.example.ecommerce.databinding.ItemProductHorizontalBinding
-import com.example.ecommerce.views.home.ProductDetailsFragment
+import java.util.Locale
 
 class ProductAdapter(
     private val layoutType: LayoutType = LayoutType.VERTICAL,
@@ -55,20 +51,22 @@ class ProductAdapter(
 
     override fun getItemCount(): Int = products.size
 
-    fun updateProducts(newProducts: List<Product>) {
+    fun getProducts(data: List<Product>) {
         products.clear()
-        products.addAll(newProducts)
-        notifyDataSetChanged()
+        products.addAll(data)
     }
 
     class VerticalProductViewHolder(
         private val binding: ItemProductBinding,
-        private val onProductClick: (Int) -> Unit // Add this parameter
+        private val onProductClick: (Int) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product) {
             binding.tvProductName.text = product.title
-            binding.tvProductPrice.text = "Rs.${product.price}"
+            binding.tvProductPrice.text = binding.root.context.getString(
+                R.string.product_price,
+                String.format(Locale.US, "%.2f", product.price) // Explicitly specify Locale
+            )
             binding.ivProductImage.load(product.image) {
                 crossfade(true)
                 placeholder(android.R.drawable.ic_menu_gallery)
@@ -82,12 +80,15 @@ class ProductAdapter(
 
     class HorizontalProductViewHolder(
         private val binding: ItemProductHorizontalBinding,
-        private val onProductClick: (Int) -> Unit // Add this parameter
+        private val onProductClick: (Int) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product) {
             binding.tvProductName.text = product.title
-            binding.tvProductPrice.text = "Rs.${product.price}"
+            binding.tvProductPrice.text = binding.root.context.getString(
+                R.string.product_price,
+                String.format(Locale.US, "%.2f", product.price) // Explicitly specify Locale
+            )
             binding.ivProductImage.load(product.image) {
                 crossfade(true)
                 placeholder(android.R.drawable.ic_menu_gallery)

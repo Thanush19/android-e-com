@@ -2,9 +2,6 @@ package com.example.ecommerce.views.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -60,17 +57,21 @@ class ProductDetailsFragment : Fragment() {
             val product = productRepository.getProductById(productId)
             if (product != null) {
                 binding.tvProductTitle.text = product.title
-                binding.tvProductPrice.text = "Rs.${product.price}"
+                binding.tvProductPrice.text = getString(R.string.product_price, product.price)
                 binding.tvProductDescription.text = product.description
-                binding.tvProductCategory.text = "Category: ${product.category}"
-                binding.tvProductRating.text = "Rating: ${product.rating.rate} stars (${product.rating.count} reviews)"
+                binding.tvProductCategory.text = getString(R.string.product_category, product.category)
+                binding.tvProductRating.text = getString(
+                    R.string.product_rating,
+                    product.rating.rate,
+                    product.rating.count
+                )
                 binding.ivProductImage.load(product.image) {
                     crossfade(true)
                     placeholder(android.R.drawable.ic_menu_gallery)
                     error(android.R.drawable.ic_menu_report_image)
                 }
             } else {
-                Toast.makeText(requireContext(), "Failed to load product", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), getString(R.string.failed_to_load_product), Toast.LENGTH_LONG).show()
                 findNavController().popBackStack()
             }
         }
@@ -83,18 +84,18 @@ class ProductDetailsFragment : Fragment() {
     private fun showConfirmationDialog() {
         val productId = args.productId
         if (productId == -1) {
-            Toast.makeText(requireContext(), "Invalid product", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.invalid_product), Toast.LENGTH_SHORT).show()
             return
         }
 
         val builder = AlertDialog.Builder(requireContext())
-            .setTitle("Confirm Purchase")
-            .setMessage("Do you want to buy this product?")
-            .setPositiveButton("Buy Now") { dialog, _ ->
+            .setTitle(getString(R.string.confirm_purchase_title))
+            .setMessage(getString(R.string.confirm_purchase_message))
+            .setPositiveButton(getString(R.string.buy_now)) { dialog, _ ->
                 dialog.dismiss()
                 processOrder(productId)
             }
-            .setNegativeButton("Cancel") { dialog, _ ->
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
             .setCancelable(true)
@@ -109,7 +110,7 @@ class ProductDetailsFragment : Fragment() {
             if (userId == null) {
                 Toast.makeText(
                     requireContext(),
-                    "Please login to place an order",
+                    getString(R.string.login_to_place_order),
                     Toast.LENGTH_SHORT
                 ).show()
                 return@launch
@@ -124,31 +125,16 @@ class ProductDetailsFragment : Fragment() {
                 val orderId = ordersRepository.placeOrder(order)
                 Toast.makeText(
                     requireContext(),
-                    "Order placed successfully!",
+                    getString(R.string.order_placed_successfully),
                     Toast.LENGTH_SHORT
                 ).show()
             } catch (e: Exception) {
                 Toast.makeText(
                     requireContext(),
-                    "Failed to place order: ${e.message}",
+                    getString(R.string.failed_to_place_order, e.message),
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.product_details_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                findNavController().popBackStack()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 

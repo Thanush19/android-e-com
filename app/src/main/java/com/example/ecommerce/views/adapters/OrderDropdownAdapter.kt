@@ -29,10 +29,9 @@ class OrderDropdownAdapter(
 
     override fun getItemCount(): Int = products.size
 
-    fun submitList(newProducts: List<Product>) {
+    fun getData(newProducts: List<Product>) {
         products.clear()
         products.addAll(newProducts)
-        notifyDataSetChanged()
     }
 
     class OrderViewHolder(
@@ -48,7 +47,6 @@ class OrderDropdownAdapter(
                 error(android.R.drawable.ic_menu_report_image)
             }
 
-            // Use callback for navigation instead of direct navigation
             binding.root.setOnClickListener {
                 onProductClick(product.id)
             }

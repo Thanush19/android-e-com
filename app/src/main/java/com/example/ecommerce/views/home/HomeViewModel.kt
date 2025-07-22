@@ -27,7 +27,7 @@ class HomeViewModel @Inject constructor(
     private val _products = MutableLiveData<List<Product>>(emptyList())
     val products: LiveData<List<Product>> = _products
 
-    private val _isLoading = MutableLiveData<Boolean>(false)
+    private val _isLoading = MutableLiveData(false)
 
     private val _error = MutableLiveData<String?>(null)
     val error: LiveData<String?> = _error

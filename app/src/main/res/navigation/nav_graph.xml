@@ -1,4 +1,3 @@
-<!-- In your nav_graph.xml -->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -16,15 +15,6 @@
             app:destination="@id/productDetailsFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/productDetailsFragment"
-        android:name="com.example.ecommerce.views.home.ProductDetailsFragment"
-        android:label="Product Details"
-        tools:layout="@layout/fragment_product_details">
-        <argument
-            android:name="productId"
-            app:argType="integer" />
-    </fragment>
 
     <fragment
         android:id="@+id/myProfileFragment"
@@ -35,5 +25,15 @@
         <action
             android:id="@+id/action_myProfileFragment_to_productDetailsFragment"
             app:destination="@id/productDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/productDetailsFragment"
+        android:name="com.example.ecommerce.views.home.ProductDetailsFragment"
+        android:label="Product Details"
+        tools:layout="@layout/fragment_product_details">
+        <argument
+            android:name="productId"
+            app:argType="integer" />
     </fragment>
 </navigation>

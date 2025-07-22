@@ -11,7 +11,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.ecommerce.R
+import com.example.ecommerce.data.model.Product
 import com.example.ecommerce.data.repository.OrdersRepository
 import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.databinding.FragmentMyProfileBinding
@@ -51,17 +53,16 @@ class MyProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         orderDropdownAdapter = OrderDropdownAdapter { productId ->
-            // Navigate to product details when a product is clicked
             val action = MyProfileFragmentDirections.actionMyProfileFragmentToProductDetailsFragment(productId)
-            popupWindow?.dismiss() // Dismiss the popup before navigating
+            popupWindow?.dismiss()
             findNavController().navigate(action)
         }
 
         vm.currentUser.observe(viewLifecycleOwner) { user ->
             if (user != null) {
-                binding.tvProfileGreeting.text = "Hi, ${user.userName}"
+                binding.tvProfileGreeting.text = getString(R.string.profile_greeting_user, user.userName)
             } else {
-                binding.tvProfileGreeting.text = "Hi, Guest"
+                binding.tvProfileGreeting.text = getString(R.string.profile_greeting_guest)
             }
         }
 
@@ -70,11 +71,12 @@ class MyProfileFragment : Fragment() {
                 lifecycleScope.launch {
                     val orders = ordersRepository.getOrdersByUser(user.id).firstOrNull()
                     if (orders.isNullOrEmpty()) {
-                        Toast.makeText(context, "No orders found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.no_orders_found), Toast.LENGTH_SHORT).show()
                         return@launch
                     }
                     val productIds = orders.flatMap { it.productIds }.distinct()
-                    val products = mutableListOf<com.example.ecommerce.data.model.Product>()
+
+                    val products = mutableListOf<Product>()
                     for (productId in productIds) {
                         productRepository.getProductById(productId)?.let { product ->
                             products.add(product)
@@ -82,13 +84,13 @@ class MyProfileFragment : Fragment() {
                     }
 
                     if (products.isEmpty()) {
-                        Toast.makeText(context, "No product details available", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.no_product_details), Toast.LENGTH_SHORT).show()
                         return@launch
                     }
                     showOrdersDropdown(products)
                 }
             } ?: run {
-                Toast.makeText(context, "Please log in to view orders", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.login_to_view_orders), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -101,27 +103,25 @@ class MyProfileFragment : Fragment() {
         }
     }
 
-    private fun showOrdersDropdown(products: List<com.example.ecommerce.data.model.Product>) {
+    private fun showOrdersDropdown(products: List<Product>) {
         popupWindow?.dismiss()
 
-        val recyclerView = androidx.recyclerview.widget.RecyclerView(requireContext()).apply {
+        val recyclerView = RecyclerView(requireContext()).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = orderDropdownAdapter
         }
-        orderDropdownAdapter.submitList(products)
+        orderDropdownAdapter.getData(products)
 
         popupWindow = PopupWindow(
             recyclerView,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
             true
         ).apply {
             isOutsideTouchable = true
             isFocusable = true
-            elevation = 8f
         }
 
-        // Show below tvMyOrders
         popupWindow?.showAsDropDown(binding.tvMyOrders)
     }
 
@@ -130,9 +130,5 @@ class MyProfileFragment : Fragment() {
         popupWindow?.dismiss()
         popupWindow = null
         _binding = null
-    }
-
-    companion object {
-        fun newInstance() = MyProfileFragment()
     }
 }

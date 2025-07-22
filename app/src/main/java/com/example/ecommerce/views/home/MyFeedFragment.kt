@@ -28,7 +28,6 @@ class MyFeedFragment : Fragment() {
     private lateinit var verticalProductAdapter: ProductAdapter
     private lateinit var horizontalProductAdapter: ProductAdapter
 
-    // Pagination variables
     private var currentPage = 0
     private val itemsPerPage = 4
     private var totalProducts = 0
@@ -55,7 +54,6 @@ class MyFeedFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        // Initialize adapters with click listeners
         horizontalProductAdapter = ProductAdapter(LayoutType.HORIZONTAL) { productId ->
             navigateToProductDetails(productId)
         }
@@ -95,7 +93,6 @@ class MyFeedFragment : Fragment() {
             }
         }
 
-        // Initially hide buttons
         paginationBinding.root.visibility = View.GONE
     }
 
@@ -104,8 +101,7 @@ class MyFeedFragment : Fragment() {
         val end = minOf(start + itemsPerPage, totalProducts)
 
         val visibleProducts = viewModel.products.value?.subList(start, end) ?: emptyList()
-        verticalProductAdapter.updateProducts(visibleProducts)
-
+        verticalProductAdapter.getProducts(visibleProducts)
         updateButtonStates()
     }
 
@@ -118,16 +114,15 @@ class MyFeedFragment : Fragment() {
         viewModel.products.observe(viewLifecycleOwner) { products ->
             totalProducts = products.size
 
-            // Only show pagination if we have more than 4 products
             if (totalProducts > itemsPerPage) {
                 paginationBinding.root.visibility = View.VISIBLE
                 updateVisibleProducts()
             } else {
                 paginationBinding.root.visibility = View.GONE
-                verticalProductAdapter.updateProducts(products)
+                verticalProductAdapter.getProducts(products)
             }
 
-            horizontalProductAdapter.updateProducts(products)
+            horizontalProductAdapter.getProducts(products)
         }
 
         viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
@@ -140,9 +135,5 @@ class MyFeedFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        fun newInstance() = MyFeedFragment()
     }
 }

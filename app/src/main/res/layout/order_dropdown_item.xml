@@ -17,7 +17,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:scaleType="centerCrop"
-            android:contentDescription="Product Image" />
+            android:contentDescription="@string/product_img_desc" />
 
         <TextView
             android:id="@+id/tvProductName"

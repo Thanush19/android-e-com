@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text="For You"
+            android:text="@string/for_you_title"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -33,14 +33,13 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_product_horizontal" />
 
-        <!-- Discover Products Section -->
         <TextView
             android:id="@+id/tvFeedTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_gravity="center_horizontal"
-            android:text="Discover Products"
+            android:text="@string/discover_products_title"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -59,7 +58,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="See More"
+            android:text="@string/see_more"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
