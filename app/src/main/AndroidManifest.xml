@@ -28,7 +28,6 @@
             android:name=".views.home.HomeActivity"
             android:exported="false" />
 
-        <activity android:name=".views.home.ProductDetailsActivity" />
     </application>
 
 </manifest>

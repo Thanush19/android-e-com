@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
@@ -54,17 +55,29 @@ class MyFeedFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        horizontalProductAdapter = ProductAdapter(LayoutType.HORIZONTAL)
+        // Initialize adapters with click listeners
+        horizontalProductAdapter = ProductAdapter(LayoutType.HORIZONTAL) { productId ->
+            navigateToProductDetails(productId)
+        }
+
+        verticalProductAdapter = ProductAdapter(LayoutType.VERTICAL) { productId ->
+            navigateToProductDetails(productId)
+        }
+
         binding.rvHorizontalProducts.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = horizontalProductAdapter
         }
 
-        verticalProductAdapter = ProductAdapter(LayoutType.VERTICAL)
         binding.rvProducts.apply {
             layoutManager = GridLayoutManager(requireContext(), 1)
             adapter = verticalProductAdapter
         }
+    }
+
+    private fun navigateToProductDetails(productId: Int) {
+        val action = MyFeedFragmentDirections.actionMyFeedFragmentToProductDetailsFragment(productId)
+        findNavController().navigate(action)
     }
 
     private fun setupPaginationButtons() {

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("androidx.navigation.safeargs.kotlin")
     id("org.jetbrains.kotlin.kapt")
     id("com.google.dagger.hilt.android")
 }
@@ -67,11 +68,9 @@ dependencies {
     // Room annotation processor
     kapt("androidx.room:room-compiler:2.6.1")
 
-    // Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
 
-    // Coil - Image Loading
     implementation("io.coil-kt:coil:2.5.0")
 
     testImplementation(libs.junit)

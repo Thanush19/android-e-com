@@ -1,22 +1,30 @@
 package com.example.ecommerce.views.home
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import coil.load
+import com.example.ecommerce.R
 import com.example.ecommerce.data.db.entity.Order
 import com.example.ecommerce.data.db.entity.User
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.data.repository.OrdersRepository
 import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.data.repository.UserRepository
-import com.example.ecommerce.databinding.ActivityProductDetailsBinding
+import com.example.ecommerce.databinding.FragmentProductDetailsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -24,9 +32,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ProductDetailsActivity : AppCompatActivity() {
+class ProductDetailsFragment : Fragment() {
 
-    private lateinit var binding: ActivityProductDetailsBinding
+    private var _binding: FragmentProductDetailsBinding? = null
+    private val binding get() = _binding!!
 
     @Inject
     lateinit var productRepository: ProductRepository
@@ -43,18 +52,23 @@ class ProductDetailsActivity : AppCompatActivity() {
     private val _currentUserId = MutableLiveData<Long?>()
     val currentUserId: LiveData<Long?> = _currentUserId
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityProductDetailsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    private val args: ProductDetailsFragmentArgs by navArgs()
 
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeButtonEnabled(true)
-            title = "Product Details"
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentProductDetailsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        val productId = intent.getIntExtra("PRODUCT_ID", -1)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setHasOptionsMenu(true)
+
+        val productId = args.productId
 
         lifecycleScope.launch {
             val product = productRepository.getProductById(productId)
@@ -70,8 +84,8 @@ class ProductDetailsActivity : AppCompatActivity() {
                     error(android.R.drawable.ic_menu_report_image)
                 }
             } else {
-                Toast.makeText(this@ProductDetailsActivity, "Failed to load product", Toast.LENGTH_LONG).show()
-                finish()
+                Toast.makeText(requireContext(), "Failed to load product", Toast.LENGTH_LONG).show()
+                findNavController().popBackStack()
             }
         }
 
@@ -81,13 +95,13 @@ class ProductDetailsActivity : AppCompatActivity() {
     }
 
     private fun showConfirmationDialog() {
-        val productId = intent.getIntExtra("PRODUCT_ID", -1)
+        val productId = args.productId
         if (productId == -1) {
-            Toast.makeText(this, "Invalid product", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Invalid product", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val builder = AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(requireContext())
             .setTitle("Confirm Purchase")
             .setMessage("Do you want to buy this product?")
             .setPositiveButton("Buy Now") { dialog, _ ->
@@ -106,10 +120,9 @@ class ProductDetailsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val userId = userPreferencesRepository.userId.first()
 
-
             if (userId == null) {
                 Toast.makeText(
-                    this@ProductDetailsActivity,
+                    requireContext(),
                     "Please login to place an order",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -124,13 +137,13 @@ class ProductDetailsActivity : AppCompatActivity() {
             try {
                 val orderId = ordersRepository.placeOrder(order)
                 Toast.makeText(
-                    this@ProductDetailsActivity,
+                    requireContext(),
                     "Order placed successfully!",
                     Toast.LENGTH_SHORT
                 ).show()
             } catch (e: Exception) {
                 Toast.makeText(
-                    this@ProductDetailsActivity,
+                    requireContext(),
                     "Failed to place order: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -138,11 +151,23 @@ class ProductDetailsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.product_details_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
+        return when (item.itemId) {
+            android.R.id.home -> {
+                findNavController().popBackStack()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

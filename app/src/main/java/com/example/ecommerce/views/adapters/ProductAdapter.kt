@@ -1,21 +1,23 @@
 
 
+
 package com.example.ecommerce.views.adapters
 
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.ecommerce.data.model.Product
 import com.example.ecommerce.databinding.ItemProductBinding
 import com.example.ecommerce.databinding.ItemProductHorizontalBinding
-import com.example.ecommerce.views.home.ProductDetailsActivity
+import com.example.ecommerce.views.home.ProductDetailsFragment
 
 class ProductAdapter(
-    private val layoutType: LayoutType = LayoutType.VERTICAL
+    private val layoutType: LayoutType = LayoutType.VERTICAL,
+    private val onProductClick: (Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
     enum class LayoutType {
         VERTICAL,
         HORIZONTAL
@@ -31,7 +33,7 @@ class ProductAdapter(
                     parent,
                     false
                 )
-                VerticalProductViewHolder(binding)
+                VerticalProductViewHolder(binding, onProductClick)
             }
             LayoutType.HORIZONTAL -> {
                 val binding = ItemProductHorizontalBinding.inflate(
@@ -39,7 +41,7 @@ class ProductAdapter(
                     parent,
                     false
                 )
-                HorizontalProductViewHolder(binding)
+                HorizontalProductViewHolder(binding, onProductClick)
             }
         }
     }
@@ -60,7 +62,8 @@ class ProductAdapter(
     }
 
     class VerticalProductViewHolder(
-        private val binding: ItemProductBinding
+        private val binding: ItemProductBinding,
+        private val onProductClick: (Int) -> Unit // Add this parameter
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product) {
@@ -72,17 +75,14 @@ class ProductAdapter(
                 error(android.R.drawable.ic_menu_report_image)
             }
             binding.root.setOnClickListener {
-                val context = binding.root.context
-                val intent = Intent(context, ProductDetailsActivity::class.java).apply {
-                    putExtra("PRODUCT_ID", product.id)
-                }
-                context.startActivity(intent)
+                onProductClick(product.id)
             }
         }
     }
 
     class HorizontalProductViewHolder(
-        private val binding: ItemProductHorizontalBinding
+        private val binding: ItemProductHorizontalBinding,
+        private val onProductClick: (Int) -> Unit // Add this parameter
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product) {
@@ -94,11 +94,7 @@ class ProductAdapter(
                 error(android.R.drawable.ic_menu_report_image)
             }
             binding.root.setOnClickListener {
-                val context = binding.root.context
-                val intent = Intent(context, ProductDetailsActivity::class.java).apply {
-                    putExtra("PRODUCT_ID", product.id)
-                }
-                context.startActivity(intent)
+                onProductClick(product.id)
             }
         }
     }

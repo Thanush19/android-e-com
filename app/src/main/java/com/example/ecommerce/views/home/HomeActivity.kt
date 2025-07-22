@@ -1,51 +1,31 @@
 package com.example.ecommerce.views.home
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.ecommerce.R
 import com.example.ecommerce.databinding.ActivityHomeBinding
-
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupBottomNavigation()
+        // Get the NavHostFragment and NavController
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.fragmentContainer) as NavHostFragment
+        navController = navHostFragment.navController
 
-        if (savedInstanceState == null) {
-            loadFragment(MyFeedFragment.newInstance())
-        }
-    }
-
-    private fun setupBottomNavigation() {
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_feed -> {
-                    loadFragment(MyFeedFragment.newInstance())
-                    return@setOnItemSelectedListener true
-                }
-                R.id.navigation_profile -> {
-                    loadFragment(MyProfileFragment.newInstance())
-                    return@setOnItemSelectedListener true
-                }
-                else -> false
-            }
-        }
-    }
-
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
+        // Connect the bottom navigation with the NavController
+        binding.bottomNavigation.setupWithNavController(navController)
     }
 }
