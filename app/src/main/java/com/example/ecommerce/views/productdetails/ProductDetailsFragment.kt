@@ -10,23 +10,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.example.ecommerce.R
 import com.example.ecommerce.data.db.entity.Order
-import com.example.ecommerce.data.db.entity.User
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.data.repository.OrdersRepository
 import com.example.ecommerce.data.repository.ProductRepository
-import com.example.ecommerce.data.repository.UserRepository
 import com.example.ecommerce.databinding.FragmentProductDetailsBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,12 +40,6 @@ class ProductDetailsFragment : Fragment() {
     @Inject
     lateinit var userPreferencesRepository: UserPreferencesRepository
 
-    @Inject
-    lateinit var userRepository: UserRepository
-
-    private val _currentUserId = MutableLiveData<Long?>()
-    val currentUserId: LiveData<Long?> = _currentUserId
-
     private val args: ProductDetailsFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -65,8 +53,6 @@ class ProductDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setHasOptionsMenu(true)
 
         val productId = args.productId
 
