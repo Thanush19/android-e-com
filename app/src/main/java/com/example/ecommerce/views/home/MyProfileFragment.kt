@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ecommerce.R
 import com.example.ecommerce.data.repository.OrdersRepository
@@ -49,7 +50,12 @@ class MyProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        orderDropdownAdapter = OrderDropdownAdapter()
+        orderDropdownAdapter = OrderDropdownAdapter { productId ->
+            // Navigate to product details when a product is clicked
+            val action = MyProfileFragmentDirections.actionMyProfileFragmentToProductDetailsFragment(productId)
+            popupWindow?.dismiss() // Dismiss the popup before navigating
+            findNavController().navigate(action)
+        }
 
         vm.currentUser.observe(viewLifecycleOwner) { user ->
             if (user != null) {

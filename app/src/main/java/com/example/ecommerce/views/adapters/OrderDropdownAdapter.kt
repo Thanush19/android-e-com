@@ -8,7 +8,9 @@ import coil.load
 import com.example.ecommerce.data.model.Product
 import com.example.ecommerce.databinding.OrderDropdownItemBinding
 
-class OrderDropdownAdapter : RecyclerView.Adapter<OrderDropdownAdapter.OrderViewHolder>() {
+class OrderDropdownAdapter(
+    private val onProductClick: (productId: Int) -> Unit
+) : RecyclerView.Adapter<OrderDropdownAdapter.OrderViewHolder>() {
 
     private val products: MutableList<Product> = mutableListOf()
 
@@ -18,7 +20,7 @@ class OrderDropdownAdapter : RecyclerView.Adapter<OrderDropdownAdapter.OrderView
             parent,
             false
         )
-        return OrderViewHolder(binding)
+        return OrderViewHolder(binding, onProductClick)
     }
 
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
@@ -34,7 +36,8 @@ class OrderDropdownAdapter : RecyclerView.Adapter<OrderDropdownAdapter.OrderView
     }
 
     class OrderViewHolder(
-        private val binding: OrderDropdownItemBinding
+        private val binding: OrderDropdownItemBinding,
+        private val onProductClick: (productId: Int) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product) {
@@ -43,6 +46,11 @@ class OrderDropdownAdapter : RecyclerView.Adapter<OrderDropdownAdapter.OrderView
                 crossfade(true)
                 placeholder(android.R.drawable.ic_menu_gallery)
                 error(android.R.drawable.ic_menu_report_image)
+            }
+
+            // Use callback for navigation instead of direct navigation
+            binding.root.setOnClickListener {
+                onProductClick(product.id)
             }
         }
     }

@@ -14,7 +14,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,9 +22,35 @@ class HomeActivity : AppCompatActivity() {
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.fragmentContainer) as NavHostFragment
-        navController = navHostFragment.navController
+        val navController = navHostFragment.navController
 
         binding.bottomNavigation.setupWithNavController(navController)
+
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.myProfileFragment -> {
+                    navController.navigate(R.id.myProfileFragment)
+                    true
+                }
+                R.id.myFeedFragment -> {
+                    navController.navigate(R.id.myFeedFragment)
+                    true
+                }
+                else -> false
+            }
+        }
+
+        binding.bottomNavigation.setOnItemReselectedListener { item ->
+            when (item.itemId) {
+                R.id.myProfileFragment -> {
+                    navController.popBackStack(R.id.myProfileFragment, false)
+                }
+                R.id.myFeedFragment -> {
+                    navController.popBackStack(R.id.myFeedFragment, false)
+                }
+            }
+        }
+
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.productDetailsFragment -> binding.bottomNavigation.visibility = View.GONE

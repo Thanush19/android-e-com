@@ -25,4 +25,15 @@
             android:name="productId"
             app:argType="integer" />
     </fragment>
+
+    <fragment
+        android:id="@+id/myProfileFragment"
+        android:name="com.example.ecommerce.views.home.MyProfileFragment"
+        android:label="My Profile"
+        tools:layout="@layout/fragment_my_profile">
+
+        <action
+            android:id="@+id/action_myProfileFragment_to_productDetailsFragment"
+            app:destination="@id/productDetailsFragment" />
+    </fragment>
 </navigation>
