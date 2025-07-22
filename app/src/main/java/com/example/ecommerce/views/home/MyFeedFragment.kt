@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
+import com.example.ecommerce.databinding.PaginationButtonsBinding
 import com.example.ecommerce.views.adapters.ProductAdapter
 import com.example.ecommerce.views.adapters.ProductAdapter.LayoutType
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,9 +20,17 @@ class MyFeedFragment : Fragment() {
 
     private var _binding: FragmentMyFeedBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var paginationBinding: PaginationButtonsBinding
+
     private val viewModel: HomeViewModel by activityViewModels()
     private lateinit var verticalProductAdapter: ProductAdapter
     private lateinit var horizontalProductAdapter: ProductAdapter
+
+    // Pagination variables
+    private var currentPage = 0
+    private val itemsPerPage = 4
+    private var totalProducts = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,8 +43,13 @@ class MyFeedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        paginationBinding = binding.paginationButtons
+
+        paginationBinding.root.visibility = View.GONE
         binding.btnSeeMore.visibility = View.GONE
+
         setupRecyclerViews()
+        setupPaginationButtons()
         observeViewModel()
     }
 
@@ -53,9 +67,53 @@ class MyFeedFragment : Fragment() {
         }
     }
 
+    private fun setupPaginationButtons() {
+        paginationBinding.btnPrevious.setOnClickListener {
+            if (currentPage > 0) {
+                currentPage--
+                updateVisibleProducts()
+            }
+        }
+
+        paginationBinding.btnNext.setOnClickListener {
+            if ((currentPage + 1) * itemsPerPage < totalProducts) {
+                currentPage++
+                updateVisibleProducts()
+            }
+        }
+
+        // Initially hide buttons
+        paginationBinding.root.visibility = View.GONE
+    }
+
+    private fun updateVisibleProducts() {
+        val start = currentPage * itemsPerPage
+        val end = minOf(start + itemsPerPage, totalProducts)
+
+        val visibleProducts = viewModel.products.value?.subList(start, end) ?: emptyList()
+        verticalProductAdapter.updateProducts(visibleProducts)
+
+        updateButtonStates()
+    }
+
+    private fun updateButtonStates() {
+        paginationBinding.btnPrevious.isEnabled = currentPage > 0
+        paginationBinding.btnNext.isEnabled = (currentPage + 1) * itemsPerPage < totalProducts
+    }
+
     private fun observeViewModel() {
         viewModel.products.observe(viewLifecycleOwner) { products ->
-            verticalProductAdapter.updateProducts(products)
+            totalProducts = products.size
+
+            // Only show pagination if we have more than 4 products
+            if (totalProducts > itemsPerPage) {
+                paginationBinding.root.visibility = View.VISIBLE
+                updateVisibleProducts()
+            } else {
+                paginationBinding.root.visibility = View.GONE
+                verticalProductAdapter.updateProducts(products)
+            }
+
             horizontalProductAdapter.updateProducts(products)
         }
 
