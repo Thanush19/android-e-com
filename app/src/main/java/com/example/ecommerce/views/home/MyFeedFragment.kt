@@ -10,10 +10,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
-import com.example.ecommerce.views.adapters.HorizontalProductAdapter
 import com.example.ecommerce.views.adapters.ProductAdapter
+import com.example.ecommerce.views.adapters.ProductAdapter.LayoutType
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.getValue
 
 @AndroidEntryPoint
 class MyFeedFragment : Fragment() {
@@ -21,8 +20,8 @@ class MyFeedFragment : Fragment() {
     private var _binding: FragmentMyFeedBinding? = null
     private val binding get() = _binding!!
     private val viewModel: HomeViewModel by activityViewModels()
-    private lateinit var productAdapter: ProductAdapter
-    private val horizontalProductAdapter by lazy { HorizontalProductAdapter() }
+    private lateinit var verticalProductAdapter: ProductAdapter
+    private lateinit var horizontalProductAdapter: ProductAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,23 +40,22 @@ class MyFeedFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
+        horizontalProductAdapter = ProductAdapter(LayoutType.HORIZONTAL)
         binding.rvHorizontalProducts.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = horizontalProductAdapter
         }
 
-        productAdapter = ProductAdapter { page ->
-        }
-
+        verticalProductAdapter = ProductAdapter(LayoutType.VERTICAL)
         binding.rvProducts.apply {
             layoutManager = GridLayoutManager(requireContext(), 1)
-            adapter = productAdapter
+            adapter = verticalProductAdapter
         }
     }
 
     private fun observeViewModel() {
         viewModel.products.observe(viewLifecycleOwner) { products ->
-            productAdapter.updateProducts(products)
+            verticalProductAdapter.updateProducts(products)
             horizontalProductAdapter.updateProducts(products)
         }
 
