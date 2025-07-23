@@ -29,7 +29,7 @@ class LoginViewModel @Inject constructor(
         _loginState.value = LoginState.Loading
         viewModelScope.launch {
             try {
-                val user = userRepository.loginUser(username, password)
+                val user = userRepository.loginUser(username)
                 if (user != null && user.password == password) {
                     userPreferencesRepository.saveUserId(user.id)
                     _loginState.value = LoginState.Success

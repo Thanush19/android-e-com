@@ -8,7 +8,7 @@
     <string name="no_product_details">No product details available</string>
     <string name="login_to_view_orders">Please log in to view orders</string>
     <string name="logout_confirmation">Are you sure you want to log out?</string>
-    <string name="product_price">Rs.%1$.2f</string>
+    <string name="product_price">Price: %s</string>
     <string name="product_category">Category: %1$s</string>
     <string name="product_rating">Rating: %1$.1f stars (%2$d reviews)</string>
     <string name="failed_to_load_product">Failed to load product</string>

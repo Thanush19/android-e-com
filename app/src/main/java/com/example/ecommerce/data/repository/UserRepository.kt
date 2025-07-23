@@ -2,7 +2,6 @@ package com.example.ecommerce.data.repository
 
 import com.example.ecommerce.data.db.dao.UserDao
 import com.example.ecommerce.data.db.entity.User
-import kotlinx.coroutines.flow.Flow
 
 class UserRepository(private val userDao: UserDao) {
     suspend fun registerUser(userName: String, password: String): Long? {
@@ -14,9 +13,8 @@ class UserRepository(private val userDao: UserDao) {
         return userDao.insertUser(newUser)
     }
 
-    suspend fun loginUser(userName: String, password: String): User? {
-        val user = userDao.getUserByUserName(userName)
-        return user
+    suspend fun loginUser(userName: String): User? {
+        return userDao.getUserByUserName(userName)
     }
 
     suspend fun getUserById(userId: Long): User? {

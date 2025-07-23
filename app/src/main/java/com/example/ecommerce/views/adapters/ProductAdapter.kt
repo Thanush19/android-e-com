@@ -65,7 +65,7 @@ class ProductAdapter(
             binding.tvProductName.text = product.title
             binding.tvProductPrice.text = binding.root.context.getString(
                 R.string.product_price,
-                String.format(Locale.US, "%.2f", product.price) // Explicitly specify Locale
+                String.format(Locale.US, "%.2f", product.price)
             )
             binding.ivProductImage.load(product.image) {
                 crossfade(true)
@@ -87,8 +87,9 @@ class ProductAdapter(
             binding.tvProductName.text = product.title
             binding.tvProductPrice.text = binding.root.context.getString(
                 R.string.product_price,
-                String.format(Locale.US, "%.2f", product.price) // Explicitly specify Locale
+                String.format(Locale.US, "%.2f", product.price)
             )
+
             binding.ivProductImage.load(product.image) {
                 crossfade(true)
                 placeholder(android.R.drawable.ic_menu_gallery)
