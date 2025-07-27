@@ -2,6 +2,7 @@ package com.example.ecommerce.views.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.ecommerce.R
@@ -51,9 +52,30 @@ class ProductAdapter(
 
     override fun getItemCount(): Int = products.size
 
-    fun getProducts(data: List<Product>) {
+    fun updateProducts(newProducts: List<Product>) {
+        val diffCallback = ProductDiffCallback(products, newProducts)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
         products.clear()
-        products.addAll(data)
+        products.addAll(newProducts)
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    class ProductDiffCallback(
+        private val oldList: List<Product>,
+        private val newList: List<Product>
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].id == newList[newItemPosition].id
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
     }
 
     class VerticalProductViewHolder(

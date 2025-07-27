@@ -18,7 +18,7 @@ class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: LoginViewModel by viewModels()
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,19 +52,16 @@ class LoginFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is LoginState.Loading -> {
+                is AuthState.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.btnLogin.isEnabled = false
                 }
-                is LoginState.Success -> {
+                is AuthState.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnLogin.isEnabled = true
-                    val intent = Intent(requireContext(), HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    requireActivity().finish()
+                    navigateToHome()
                 }
-                is LoginState.Error -> {
+                is AuthState.Error -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnLogin.isEnabled = true
                     Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
@@ -73,9 +70,15 @@ class LoginFragment : Fragment() {
         }
     }
 
+    private fun navigateToHome() {
+        val intent = Intent(requireContext(), HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        requireActivity().finish()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
-

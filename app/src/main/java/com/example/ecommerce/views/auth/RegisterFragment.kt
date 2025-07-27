@@ -17,7 +17,7 @@ class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: RegisterViewModel by viewModels()
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,19 +49,16 @@ class RegisterFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.registerState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is RegisterState.Loading -> {
+                is AuthState.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.btnRegister.isEnabled = false
                 }
-                is RegisterState.Success -> {
+                is AuthState.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnRegister.isEnabled = true
-                    val intent = Intent(requireContext(), HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    requireActivity().finish()
+                    navigateToHome()
                 }
-                is RegisterState.Error -> {
+                is AuthState.Error -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnRegister.isEnabled = true
                     Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
@@ -70,9 +67,15 @@ class RegisterFragment : Fragment() {
         }
     }
 
+    private fun navigateToHome() {
+        val intent = Intent(requireContext(), HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        requireActivity().finish()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
-

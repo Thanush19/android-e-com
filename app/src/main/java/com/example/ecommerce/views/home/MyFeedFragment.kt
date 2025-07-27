@@ -101,7 +101,7 @@ class MyFeedFragment : Fragment() {
         val end = minOf(start + itemsPerPage, totalProducts)
 
         val visibleProducts = viewModel.products.value?.subList(start, end) ?: emptyList()
-        verticalProductAdapter.getProducts(visibleProducts)
+        verticalProductAdapter.updateProducts(visibleProducts)
         updateButtonStates()
     }
 
@@ -119,10 +119,10 @@ class MyFeedFragment : Fragment() {
                 updateVisibleProducts()
             } else {
                 paginationBinding.root.visibility = View.GONE
-                verticalProductAdapter.getProducts(products)
+                verticalProductAdapter.updateProducts(products)
             }
 
-            horizontalProductAdapter.getProducts(products)
+            horizontalProductAdapter.updateProducts(products)
         }
 
         viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
