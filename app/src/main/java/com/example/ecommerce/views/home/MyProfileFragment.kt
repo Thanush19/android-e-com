@@ -119,7 +119,6 @@ class MyProfileFragment : Fragment() {
             true
         ).apply {
             isOutsideTouchable = true
-            isFocusable = true
         }
 
         popupWindow?.showAsDropDown(binding.tvMyOrders)

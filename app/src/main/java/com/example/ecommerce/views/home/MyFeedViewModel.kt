@@ -15,31 +15,36 @@ class MyFeedViewModel @Inject constructor(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    private val _products = MutableLiveData<List<Product>>(emptyList())
-    val products: LiveData<List<Product>> = _products
+    private val _products = MutableLiveData<List<Product>?>()
+    val products: LiveData<List<Product>?> = _products
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val _error = MutableLiveData<String?>(null)
+    private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    init {
-        loadProducts()
-    }
-
-    private fun loadProducts() {
+    fun fetchProductsByIds(ids: List<Int>) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             try {
-                val productList = productRepository.getAllProducts() ?: emptyList()
-                _products.value = productList
-                if (productList.isEmpty()) {
-                    _error.value = "No products found"
+                val fetchedProducts = mutableListOf<Product>()
+                for (id in ids) {
+                    val product = productRepository.getProductById(id)
+                    if (product != null) {
+                        fetchedProducts.add(product)
+                    } else {
+                        _error.value = "Failed to fetch product with ID $id"
+                        break
+                    }
+                }
+                if (fetchedProducts.isNotEmpty()) {
+                    _products.value = fetchedProducts
+                } else if (_error.value == null) {
+                    _error.value = "No products fetched"
                 }
             } catch (e: Exception) {
-                _products.value = emptyList()
                 _error.value = e.message
             } finally {
                 _isLoading.value = false

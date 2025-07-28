@@ -60,6 +60,8 @@ class ProductAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
+    fun getProducts(): List<Product> = products.toList()
+
     class ProductDiffCallback(
         private val oldList: List<Product>,
         private val newList: List<Product>
@@ -111,7 +113,6 @@ class ProductAdapter(
                 R.string.product_price,
                 String.format(Locale.US, "%.2f", product.price)
             )
-
             binding.ivProductImage.load(product.image) {
                 crossfade(true)
                 placeholder(android.R.drawable.ic_menu_gallery)

@@ -10,8 +10,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.widget.NestedScrollView
+import androidx.recyclerview.widget.RecyclerView
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
-import com.example.ecommerce.databinding.PaginationButtonsBinding
 import com.example.ecommerce.views.adapters.ProductAdapter
 import com.example.ecommerce.views.adapters.ProductAdapter.LayoutType
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,15 +23,15 @@ class MyFeedFragment : Fragment() {
     private var _binding: FragmentMyFeedBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var paginationBinding: PaginationButtonsBinding
-
-    private val viewModel: MyFeedViewModel by viewModels()
+    private val vm: MyFeedViewModel by viewModels()
     private lateinit var verticalProductAdapter: ProductAdapter
     private lateinit var horizontalProductAdapter: ProductAdapter
 
-    private var currentPage = 0
-    private val itemsPerPage = 4
-    private var totalProducts = 0
+    private var currentProductId = 1
+    private val maxProductId = 20
+    private val batchSize = 3
+    private var isLoading = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,14 +44,11 @@ class MyFeedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        paginationBinding = binding.paginationButtons
-
-        paginationBinding.root.visibility = View.GONE
-        binding.btnSeeMore.visibility = View.GONE
 
         setupRecyclerViews()
-        setupPaginationButtons()
+        setupScrollListeners()
         observeViewModel()
+        fetchNextBatch()
     }
 
     private fun setupRecyclerViews() {
@@ -73,61 +71,77 @@ class MyFeedFragment : Fragment() {
         }
     }
 
+    private fun setupScrollListeners() {
+        binding.nestedScrollView.setOnScrollChangeListener { v: NestedScrollView, _, scrollY, _, oldScrollY ->
+            if (!isLoading && currentProductId <= maxProductId) {
+                val layoutManager = binding.rvProducts.layoutManager as GridLayoutManager
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                val totalItemCount = verticalProductAdapter.itemCount
+
+                if (lastVisibleItemPosition >= totalItemCount - 2) {
+                    fetchNextBatch()
+                }
+            }
+        }
+
+        binding.rvHorizontalProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (!isLoading && currentProductId <= maxProductId) {
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                    val totalItemCount = horizontalProductAdapter.itemCount
+
+                    if (lastVisibleItemPosition >= totalItemCount - 2) {
+                        fetchNextBatch()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun fetchNextBatch() {
+        if (isLoading || currentProductId > maxProductId) return
+
+        isLoading = true
+        binding.progressBar.visibility = View.VISIBLE
+
+        val endId = minOf(currentProductId + batchSize - 1, maxProductId)
+        val idsToFetch = (currentProductId..endId).toList()
+        vm.fetchProductsByIds(idsToFetch)
+    }
+
     private fun navigateToProductDetails(productId: Int) {
         val action = MyFeedFragmentDirections.actionMyFeedFragmentToProductDetailsFragment(productId)
         findNavController().navigate(action)
     }
 
-    private fun setupPaginationButtons() {
-        paginationBinding.btnPrevious.setOnClickListener {
-            if (currentPage > 0) {
-                currentPage--
-                updateVisibleProducts()
-            }
-        }
-
-        paginationBinding.btnNext.setOnClickListener {
-            if ((currentPage + 1) * itemsPerPage < totalProducts) {
-                currentPage++
-                updateVisibleProducts()
-            }
-        }
-
-        paginationBinding.root.visibility = View.GONE
-    }
-
-    private fun updateVisibleProducts() {
-        val start = currentPage * itemsPerPage
-        val end = minOf(start + itemsPerPage, totalProducts)
-
-        val visibleProducts = viewModel.products.value?.subList(start, end) ?: emptyList()
-        verticalProductAdapter.updateProducts(visibleProducts)
-        updateButtonStates()
-    }
-
-    private fun updateButtonStates() {
-        paginationBinding.btnPrevious.isEnabled = currentPage > 0
-        paginationBinding.btnNext.isEnabled = (currentPage + 1) * itemsPerPage < totalProducts
-    }
-
     private fun observeViewModel() {
-        viewModel.products.observe(viewLifecycleOwner) { products ->
-            totalProducts = products.size
-
-            if (totalProducts > itemsPerPage) {
-                paginationBinding.root.visibility = View.VISIBLE
-                updateVisibleProducts()
-            } else {
-                paginationBinding.root.visibility = View.GONE
-                verticalProductAdapter.updateProducts(products)
+        vm.products.observe(viewLifecycleOwner) { newProducts ->
+            newProducts?.let {
+                val currentProducts = verticalProductAdapter.getProducts().toMutableList()
+                val filteredNewProducts = it.filter { product -> !currentProducts.any { p -> p.id == product.id } }
+                if (filteredNewProducts.isNotEmpty()) {
+                    currentProducts.addAll(filteredNewProducts)
+                    verticalProductAdapter.updateProducts(currentProducts)
+                    horizontalProductAdapter.updateProducts(currentProducts)
+                }
+                isLoading = false
+                binding.progressBar.visibility = View.GONE
+                currentProductId += batchSize
             }
-
-            horizontalProductAdapter.updateProducts(products)
         }
 
-        viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
+        vm.isLoading.observe(viewLifecycleOwner) { loading ->
+            isLoading = loading
+            binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+        }
+
+        vm.error.observe(viewLifecycleOwner) { errorMessage ->
             errorMessage?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                isLoading = false
+                binding.progressBar.visibility = View.GONE
+                currentProductId += batchSize
             }
         }
     }
