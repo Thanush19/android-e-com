@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,7 +29,7 @@ class MyProfileFragment : Fragment() {
 
     private var _binding: FragmentMyProfileBinding? = null
     private val binding get() = _binding!!
-    private val vm: HomeViewModel by activityViewModels()
+    private val vm: MyProfileViewModel by viewModels()
 
     @Inject
     lateinit var ordersRepository: OrdersRepository
