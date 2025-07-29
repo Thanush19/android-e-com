@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.ecommerce.R
 import com.example.ecommerce.databinding.FragmentLoginBinding
 import com.example.ecommerce.views.home.HomeActivity
@@ -42,10 +43,7 @@ class LoginFragment : Fragment() {
         }
 
         binding.tvRegisterPrompt.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, RegisterFragment())
-                .addToBackStack(null)
-                .commit()
+            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
     }
 
@@ -71,10 +69,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun navigateToHome() {
-        val intent = Intent(requireContext(), HomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        requireActivity().finish()
+        findNavController().navigate(R.id.action_loginFragment_to_myFeedFragment)
     }
 
     override fun onDestroyView() {

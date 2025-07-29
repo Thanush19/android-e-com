@@ -1,65 +1,88 @@
 package com.example.ecommerce
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.ecommerce.MainViewModel
-import com.example.ecommerce.data.preferences.UserPreferencesRepository
-import com.example.ecommerce.views.auth.LoginFragment
-import com.example.ecommerce.views.home.HomeActivity
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.example.ecommerce.databinding.ActivityMainBinding
+import com.example.ecommerce.views.auth.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
+import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val vm: MainViewModel by viewModels()
+    private lateinit var binding: ActivityMainBinding
+    private val vm: AuthViewModel by viewModels()
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.fragmentContainer) as? NavHostFragment
+            ?: throw IllegalStateException("fragment not found")
+        navController = navHostFragment.navController
+
+        binding.bottomNavigation.setupWithNavController(navController)
+
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.myProfileFragment -> {
+                    navController.navigate(R.id.myProfileFragment)
+                    true
+                }
+                R.id.myFeedFragment -> {
+                    navController.navigate(R.id.myFeedFragment)
+                    true
+                }
+                else -> false
+            }
+        }
+
+        binding.bottomNavigation.setOnItemReselectedListener { item ->
+            when (item.itemId) {
+                R.id.myProfileFragment -> {
+                    navController.popBackStack(R.id.myProfileFragment, false)
+                }
+                R.id.myFeedFragment -> {
+                    navController.popBackStack(R.id.myFeedFragment, false)
+                }
+            }
+        }
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.myFeedFragment, R.id.myProfileFragment -> {
+                    binding.bottomNavigation.visibility = View.VISIBLE
+                }
+                else -> {
+                    binding.bottomNavigation.visibility = View.GONE
+                }
+            }
+        }
+
         observeAuthState()
     }
 
     private fun observeAuthState() {
-        vm.isLoggedIn.observe(this) { isLoggedIn ->
-            if (isLoggedIn) {
-                val intent = Intent(this, HomeActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-            } else {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, LoginFragment())
-                    .commit()
+        lifecycleScope.launch {
+            vm.loggedIn.collectLatest { isLoggedIn ->
+                val currentDestination = navController.currentDestination?.id
+                if (isLoggedIn && currentDestination != R.id.myFeedFragment) {
+                    navController.navigate(R.id.myFeedFragment)
+                } else if (!isLoggedIn && currentDestination != R.id.loginFragment) {
+                    navController.navigate(R.id.loginFragment)
+                }
             }
         }
-    }
-}
 
-@HiltViewModel
-class MainViewModel @Inject constructor(
-    private val userPreferencesRepository: UserPreferencesRepository
-) : ViewModel() {
-
-    private val _isLoggedIn = MutableLiveData<Boolean>(false)
-    val isLoggedIn: LiveData<Boolean> = _isLoggedIn
-
-    init {
-        checkAuthState()
-    }
-
-    private fun checkAuthState() {
-        viewModelScope.launch {
-            _isLoggedIn.value = userPreferencesRepository.isLoggedIn.first()
-        }
     }
 }

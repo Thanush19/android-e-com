@@ -1,13 +1,13 @@
 package com.example.ecommerce.views.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ecommerce.data.db.entity.User
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,8 +18,8 @@ class MyProfileViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
-    private val _currentUser = MutableLiveData<User?>()
-    val currentUser: LiveData<User?> = _currentUser
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser
 
     init {
         loadUserData()

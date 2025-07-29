@@ -1,12 +1,13 @@
 package com.example.ecommerce.views.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ecommerce.data.model.Product
 import com.example.ecommerce.data.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,17 +16,28 @@ class MyFeedViewModel @Inject constructor(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    private val _products = MutableLiveData<List<Product>?>()
-    val products: LiveData<List<Product>?> = _products
+    private val _products = MutableStateFlow<List<Product>?>(null)
+    val products: StateFlow<List<Product>?> = _products.asStateFlow()
 
-    private val _allProducts = MutableLiveData<List<Product>>(emptyList())
-    val allProducts: LiveData<List<Product>> = _allProducts
+    private val _allProducts = MutableStateFlow<List<Product>>(emptyList())
+    val allProducts: StateFlow<List<Product>> = _allProducts.asStateFlow()
 
-    private val _isLoading = MutableLiveData(false)
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+
+    init{
+        fetchAllProducts()
+    }
+
+    fun fetchAllProducts() {
+        viewModelScope.launch {
+            _allProducts.value = productRepository.getAllProducts() ?: emptyList()
+        }
+    }
+
 
     fun fetchProductsByIds(ids: List<Int>) {
         viewModelScope.launch {
@@ -38,23 +50,17 @@ class MyFeedViewModel @Inject constructor(
                     if (product != null) {
                         fetchedProducts.add(product)
                     } else {
-                        _error.value = "Failed to fetch product with ID $id"
+                        _error.emit("Failed to fetch ID $id")
                         break
                     }
                 }
                 if (fetchedProducts.isNotEmpty()) {
                     _products.value = fetchedProducts
-                    val currentAllProducts = _allProducts.value?.toMutableList() ?: mutableListOf()
-                    val filteredNewProducts = fetchedProducts.filter { product ->
-                        !currentAllProducts.any { p -> p.id == product.id }
-                    }
-                    currentAllProducts.addAll(filteredNewProducts)
-                    _allProducts.value = currentAllProducts
-                } else if (_error.value == null) {
-                    _error.value = "No products fetched"
+                } else if (_error.replayCache.isEmpty()) {
+                    _error.value ="No products fetched"
                 }
             } catch (e: Exception) {
-                _error.value = e.message ?: "An error occurred"
+                _error.value =e.message
             } finally {
                 _isLoading.value = false
             }

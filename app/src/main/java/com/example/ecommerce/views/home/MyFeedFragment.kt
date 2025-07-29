@@ -6,18 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ecommerce.R
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
 import com.example.ecommerce.views.adapters.ProductAdapter
 import com.example.ecommerce.views.adapters.ProductAdapter.LayoutType
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MyFeedFragment : Fragment() {
@@ -106,32 +111,33 @@ class MyFeedFragment : Fragment() {
             val popupMenu = PopupMenu(requireContext(), view)
             popupMenu.menuInflater.inflate(R.menu.menu_filter, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener { item ->
-                val currentProducts = vm.allProducts.value?.toMutableList() ?: mutableListOf()
-                if (currentProducts.isNotEmpty()) {
+                val allProducts = vm.allProducts.value.toMutableList()
+                if (allProducts.isNotEmpty()) {
                     val sortedProducts = when (item.itemId) {
-                        R.id.sort_price_asc -> currentProducts.sortedBy { it.price }
-                        R.id.sort_price_desc -> currentProducts.sortedByDescending { it.price }
-                        R.id.sort_name_asc -> currentProducts.sortedBy { it.title }
-                        R.id.sort_name_desc -> currentProducts.sortedByDescending { it.title }
-                        else -> currentProducts
+                        R.id.sort_price_asc -> allProducts.sortedBy { it.price }
+                        R.id.sort_price_desc -> allProducts.sortedByDescending { it.price }
+                        R.id.sort_name_asc -> allProducts.sortedBy { it.title }
+                        R.id.sort_name_desc -> allProducts.sortedByDescending { it.title }
+                        else -> allProducts
                     }
                     verticalProductAdapter.updateProducts(sortedProducts)
                     horizontalProductAdapter.updateProducts(sortedProducts)
                     binding.rvProducts.scrollToPosition(0)
                     binding.rvHorizontalProducts.scrollToPosition(0)
                 } else {
-                    Toast.makeText(requireContext(), "No products avl.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "No products available.", Toast.LENGTH_SHORT).show()
                 }
                 true
             }
             popupMenu.show()
         }
     }
+
     private fun fetchNextBatch() {
         if (isLoading || currentProductId > maxProductId) return
 
         isLoading = true
-        binding.progressBar.visibility = View.VISIBLE
+        _binding?.progressBar?.visibility = View.VISIBLE
 
         val endId = minOf(currentProductId + batchSize - 1, maxProductId)
         val idsToFetch = (currentProductId..endId).toList()
@@ -144,32 +150,46 @@ class MyFeedFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        vm.products.observe(viewLifecycleOwner) { newProducts ->
-            newProducts?.let {
-                val currentProducts = verticalProductAdapter.getProducts().toMutableList()
-                val filteredNewProducts = it.filter { product -> !currentProducts.any { p -> p.id == product.id } }
-                if (filteredNewProducts.isNotEmpty()) {
-                    currentProducts.addAll(filteredNewProducts)
-                    verticalProductAdapter.updateProducts(currentProducts)
-                    horizontalProductAdapter.updateProducts(currentProducts)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    vm.products.collectLatest { newProducts ->
+                        newProducts?.let {
+                            val currentProducts = verticalProductAdapter.getProducts().toMutableList()
+                            val filteredNewProducts = it.filter { product ->
+                                !currentProducts.any { p -> p.id == product.id }
+                            }
+                            if (filteredNewProducts.isNotEmpty()) {
+                                currentProducts.addAll(filteredNewProducts)
+                                verticalProductAdapter.updateProducts(currentProducts)
+                                horizontalProductAdapter.updateProducts(currentProducts)
+                            }
+                            isLoading = false
+                            _binding?.progressBar?.visibility = View.GONE
+                            currentProductId += batchSize
+                        }
+                    }
                 }
-                isLoading = false
-                binding.progressBar.visibility = View.GONE
-                currentProductId += batchSize
-            }
-        }
 
-        vm.isLoading.observe(viewLifecycleOwner) { loading ->
-            isLoading = loading
-            binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
-        }
+                launch {
+                    vm.isLoading.collectLatest { loading ->
+                        isLoading = loading
+                        _binding?.progressBar?.visibility = if (loading) View.VISIBLE else View.GONE
+                    }
+                }
 
-        vm.error.observe(viewLifecycleOwner) { errorMessage ->
-            errorMessage?.let {
-                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-                isLoading = false
-                binding.progressBar.visibility = View.GONE
-                currentProductId += batchSize
+                launch {
+                    vm.error.collectLatest { errorMessage ->
+                        errorMessage?.let {
+                            _binding?.let { binding ->
+                                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                                isLoading = false
+                                binding.progressBar.visibility = View.GONE
+                                currentProductId += batchSize
+                            }
+                        }
+                    }
+                }
             }
         }
     }

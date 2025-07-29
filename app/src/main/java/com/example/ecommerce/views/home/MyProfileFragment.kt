@@ -8,7 +8,9 @@ import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +20,6 @@ import com.example.ecommerce.data.repository.OrdersRepository
 import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.databinding.FragmentMyProfileBinding
 import com.example.ecommerce.views.adapters.OrderDropdownAdapter
-import com.example.ecommerce.views.auth.LoginFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -58,11 +59,15 @@ class MyProfileFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        vm.currentUser.observe(viewLifecycleOwner) { user ->
-            if (user != null) {
-                binding.tvProfileGreeting.text = getString(R.string.profile_greeting_user, user.userName)
-            } else {
-                binding.tvProfileGreeting.text = getString(R.string.profile_greeting_guest)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.currentUser.collect { user ->
+                    _binding?.tvProfileGreeting?.text = if (user != null) {
+                        getString(R.string.profile_greeting_user, user.userName)
+                    } else {
+                        getString(R.string.profile_greeting_guest)
+                    }
+                }
             }
         }
 
@@ -96,10 +101,7 @@ class MyProfileFragment : Fragment() {
 
         binding.tvLogout.setOnClickListener {
             vm.logout()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, LoginFragment())
-                .addToBackStack(null)
-                .commit()
+            findNavController().navigate(R.id.action_myProfileFragment_to_loginFragment)
         }
     }
 

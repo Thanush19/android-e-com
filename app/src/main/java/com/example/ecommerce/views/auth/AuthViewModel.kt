@@ -7,6 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,9 +25,25 @@ class AuthViewModel @Inject constructor(
     private val _registerState = MutableLiveData<AuthState>()
     val registerState: LiveData<AuthState> = _registerState
 
+    private val _loggedIn = MutableStateFlow<Boolean>(false)
+    val loggedIn: StateFlow<Boolean> = _loggedIn.asStateFlow()
+
+
+    init {
+        checkAuthState()
+    }
+
+    private fun checkAuthState() {
+        viewModelScope.launch {
+            userPreferencesRepository.isLoggedIn.collect { isLoggedIn ->
+                _loggedIn.value = isLoggedIn
+            }
+        }
+    }
+
     fun login(username: String, password: String) {
         if (username.isBlank() || password.isBlank()) {
-            _loginState.value = AuthState.Error("Username and pw cant be empty")
+            _loginState.value = AuthState.Error("Username and password can't be empty")
             return
         }
 
@@ -35,8 +54,9 @@ class AuthViewModel @Inject constructor(
                 if (user != null && user.password == password) {
                     userPreferencesRepository.saveUserId(user.id)
                     _loginState.value = AuthState.Success
+                    _loggedIn.value = true
                 } else {
-                    _loginState.value = AuthState.Error("Invalid name or pw")
+                    _loginState.value = AuthState.Error("Invalid username or password")
                 }
             } catch (e: Exception) {
                 _loginState.value = AuthState.Error("Login failed: ${e.message}")
@@ -62,6 +82,7 @@ class AuthViewModel @Inject constructor(
                 if (userId != null) {
                     userPreferencesRepository.saveUserId(userId)
                     _registerState.value = AuthState.Success
+                    _loggedIn.value = true
                 } else {
                     _registerState.value = AuthState.Error("Username already exists")
                 }

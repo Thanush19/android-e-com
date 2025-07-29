@@ -6,17 +6,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.ecommerce.R
-import com.example.ecommerce.databinding.ActivityHomeBinding
+import com.example.ecommerce.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityHomeBinding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityHomeBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val navHostFragment = supportFragmentManager
@@ -52,8 +52,12 @@ class HomeActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.productDetailsFragment -> binding.bottomNavigation.visibility = View.GONE
-                else -> binding.bottomNavigation.visibility = View.VISIBLE
+                R.id.myFeedFragment, R.id.myProfileFragment -> {
+                    binding.bottomNavigation.visibility = View.VISIBLE
+                }
+                else -> {
+                    binding.bottomNavigation.visibility = View.GONE
+                }
             }
         }
     }
