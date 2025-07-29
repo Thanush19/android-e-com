@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 class MyFeedViewModel @Inject constructor(
     private val productRepository: ProductRepository
@@ -31,13 +30,22 @@ class MyFeedViewModel @Inject constructor(
     }
 
     fun fetchAllProducts() {
+        println("DEBUG: fetchAllProducts called, loading: ${_isLoading.value}")
+        if (_isLoading.value) return
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             try {
-                val products = productRepository.getAllProducts() ?: emptyList()
-                _allProducts.value = products
+                println("DEBUG: Making API call to get products")
+                val newProducts = productRepository.getAllProducts() ?: emptyList()
+                println("DEBUG: Got ${newProducts.size} new products")
+                val currentList = _allProducts.value.toMutableList()
+                val oldSize = currentList.size
+                currentList.addAll(newProducts)
+                _allProducts.value = currentList
+                println("DEBUG: Total products now: ${currentList.size}, added ${currentList.size - oldSize}")
             } catch (e: Exception) {
+                println("DEBUG: Error fetching products: ${e.message}")
                 _error.value = e.message ?: "Failed to fetch products"
             } finally {
                 _isLoading.value = false

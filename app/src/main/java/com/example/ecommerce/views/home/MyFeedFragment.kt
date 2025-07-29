@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -23,7 +24,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class MyFeedFragment : Fragment() {
@@ -52,7 +52,9 @@ class MyFeedFragment : Fragment() {
 
         setupRecyclerViews()
         setupFilter()
+        setupScrollListener()
         observeViewModel()
+
     }
 
     private fun setupRecyclerViews() {
@@ -67,11 +69,13 @@ class MyFeedFragment : Fragment() {
         binding.rvHorizontalProducts.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = horizontalProductAdapter
+            isNestedScrollingEnabled = false
         }
 
         binding.rvProducts.apply {
             layoutManager = GridLayoutManager(requireContext(), 1)
             adapter = verticalProductAdapter
+            isNestedScrollingEnabled = false
         }
     }
 
@@ -134,14 +138,28 @@ class MyFeedFragment : Fragment() {
         findNavController().navigate(action)
     }
 
+    private fun setupScrollListener() {
+        binding.nestedScrollView.setOnScrollChangeListener { v, _, scrollY, _, oldScrollY ->
+            val nestedScrollView = v as NestedScrollView
+            val child = nestedScrollView.getChildAt(0)
+            val childHeight = child.height
+            val scrollViewHeight = nestedScrollView.height
+            val isLoading = vm.isLoading.value
+
+
+            if (!isLoading && scrollY >= childHeight - scrollViewHeight - 200) {
+                vm.fetchAllProducts()
+            }
+        }
+    }
+
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     vm.allProducts.collect { products ->
-                        if (products.isNotEmpty()) {
-                            applyFilter(currentSortOption)
-                        }
+                        applyFilter(currentSortOption)
+
                     }
                 }
 
