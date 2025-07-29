@@ -11,13 +11,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class MyFeedViewModel @Inject constructor(
     private val productRepository: ProductRepository
 ) : ViewModel() {
-
-    private val _products = MutableStateFlow<List<Product>?>(null)
-    val products: StateFlow<List<Product>?> = _products.asStateFlow()
 
     private val _allProducts = MutableStateFlow<List<Product>>(emptyList())
     val allProducts: StateFlow<List<Product>> = _allProducts.asStateFlow()
@@ -28,39 +26,19 @@ class MyFeedViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
-    init{
+    init {
         fetchAllProducts()
     }
 
     fun fetchAllProducts() {
         viewModelScope.launch {
-            _allProducts.value = productRepository.getAllProducts() ?: emptyList()
-        }
-    }
-
-
-    fun fetchProductsByIds(ids: List<Int>) {
-        viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             try {
-                val fetchedProducts = mutableListOf<Product>()
-                for (id in ids) {
-                    val product = productRepository.getProductById(id)
-                    if (product != null) {
-                        fetchedProducts.add(product)
-                    } else {
-                        _error.emit("Failed to fetch ID $id")
-                        break
-                    }
-                }
-                if (fetchedProducts.isNotEmpty()) {
-                    _products.value = fetchedProducts
-                } else if (_error.replayCache.isEmpty()) {
-                    _error.value ="No products fetched"
-                }
+                val products = productRepository.getAllProducts() ?: emptyList()
+                _allProducts.value = products
             } catch (e: Exception) {
-                _error.value =e.message
+                _error.value = e.message ?: "Failed to fetch products"
             } finally {
                 _isLoading.value = false
             }
