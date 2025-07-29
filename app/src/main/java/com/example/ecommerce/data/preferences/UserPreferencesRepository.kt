@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,7 @@ class UserPreferencesRepository(private val context: Context) {
 
     companion object {
         private val USER_ID_KEY = longPreferencesKey("user_id")
+        private val SORT_OPTION_KEY = intPreferencesKey("sort_option")
     }
 
     val userId: Flow<Long?> = context.dataStore.data.map { preferences ->
@@ -23,6 +25,10 @@ class UserPreferencesRepository(private val context: Context) {
 
     val isLoggedIn: Flow<Boolean> = userId.map { id ->
         id != null
+    }
+
+    val sortOption: Flow<Int?> = context.dataStore.data.map { preferences ->
+        preferences[SORT_OPTION_KEY]
     }
 
     suspend fun saveUserId(userId: Long) {
@@ -34,6 +40,18 @@ class UserPreferencesRepository(private val context: Context) {
     suspend fun clearUserId() {
         context.dataStore.edit { preferences ->
             preferences.remove(USER_ID_KEY)
+        }
+    }
+
+    suspend fun saveSortOption(sortOption: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[SORT_OPTION_KEY] = sortOption
+        }
+    }
+
+    suspend fun clearSortOption() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(SORT_OPTION_KEY)
         }
     }
 }

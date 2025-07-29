@@ -17,12 +17,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ecommerce.R
+import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
 import com.example.ecommerce.views.adapters.ProductAdapter
 import com.example.ecommerce.views.adapters.ProductAdapter.LayoutType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyFeedFragment : Fragment() {
@@ -31,13 +33,16 @@ class MyFeedFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val vm: MyFeedViewModel by viewModels()
+    @Inject
+    lateinit var userPreferencesRepository: UserPreferencesRepository
     private lateinit var verticalProductAdapter: ProductAdapter
     private lateinit var horizontalProductAdapter: ProductAdapter
 
     private var currentProductId = 1
     private val maxProductId = 20
-    private val batchSize = 3
+    private var batchSize = 3
     private var isLoading = false
+    private var currentSortOption: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -110,26 +115,53 @@ class MyFeedFragment : Fragment() {
         binding.ivFilter.setOnClickListener { view ->
             val popupMenu = PopupMenu(requireContext(), view)
             popupMenu.menuInflater.inflate(R.menu.menu_filter, popupMenu.menu)
+            popupMenu.menu.findItem(R.id.clear_filter)?.isVisible = currentSortOption != null
             popupMenu.setOnMenuItemClickListener { item ->
-                val allProducts = vm.allProducts.value.toMutableList()
-                if (allProducts.isNotEmpty()) {
-                    val sortedProducts = when (item.itemId) {
-                        R.id.sort_price_asc -> allProducts.sortedBy { it.price }
-                        R.id.sort_price_desc -> allProducts.sortedByDescending { it.price }
-                        R.id.sort_name_asc -> allProducts.sortedBy { it.title }
-                        R.id.sort_name_desc -> allProducts.sortedByDescending { it.title }
-                        else -> allProducts
+                viewLifecycleOwner.lifecycleScope.launch {
+                    when (item.itemId) {
+                        R.id.clear_filter -> {
+                            userPreferencesRepository.clearSortOption()
+                            currentSortOption = null
+                            applyFilter(null)
+                        }
+                        else -> {
+                            userPreferencesRepository.saveSortOption(item.itemId)
+                            currentSortOption = item.itemId
+                            applyFilter(item.itemId)
+                        }
                     }
-                    verticalProductAdapter.updateProducts(sortedProducts)
-                    horizontalProductAdapter.updateProducts(sortedProducts)
-                    binding.rvProducts.scrollToPosition(0)
-                    binding.rvHorizontalProducts.scrollToPosition(0)
-                } else {
-                    Toast.makeText(requireContext(), "No products available.", Toast.LENGTH_SHORT).show()
                 }
                 true
             }
             popupMenu.show()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                userPreferencesRepository.sortOption.collectLatest { sortOption ->
+                    currentSortOption = sortOption
+                    applyFilter(sortOption)
+                }
+            }
+        }
+    }
+
+    private fun applyFilter(sortOption: Int?) {
+        val allProducts = vm.allProducts.value.toMutableList()
+        if (allProducts.isNotEmpty()) {
+            val sortedProducts = when (sortOption) {
+                R.id.sort_price_asc -> allProducts.sortedBy { it.price }
+                R.id.sort_price_desc -> allProducts.sortedByDescending { it.price }
+                R.id.sort_name_asc -> allProducts.sortedBy { it.title }
+                R.id.sort_name_desc -> allProducts.sortedByDescending { it.title }
+                else -> allProducts
+            }
+            verticalProductAdapter.updateProducts(sortedProducts)
+            horizontalProductAdapter.updateProducts(sortedProducts)
+            binding.rvProducts.scrollToPosition(0)
+            binding.rvHorizontalProducts.scrollToPosition(0)
+        } else {
+            Toast.makeText(requireContext(), "No products available.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -161,8 +193,17 @@ class MyFeedFragment : Fragment() {
                             }
                             if (filteredNewProducts.isNotEmpty()) {
                                 currentProducts.addAll(filteredNewProducts)
-                                verticalProductAdapter.updateProducts(currentProducts)
-                                horizontalProductAdapter.updateProducts(currentProducts)
+                                val sortedProducts = currentSortOption?.let { sortOption ->
+                                    when (sortOption) {
+                                        R.id.sort_price_asc -> currentProducts.sortedBy { it.price }
+                                        R.id.sort_price_desc -> currentProducts.sortedByDescending { it.price }
+                                        R.id.sort_name_asc -> currentProducts.sortedBy { it.title }
+                                        R.id.sort_name_desc -> currentProducts.sortedByDescending { it.title }
+                                        else -> currentProducts
+                                    }
+                                } ?: currentProducts
+                                verticalProductAdapter.updateProducts(sortedProducts)
+                                horizontalProductAdapter.updateProducts(sortedProducts)
                             }
                             isLoading = false
                             _binding?.progressBar?.visibility = View.GONE

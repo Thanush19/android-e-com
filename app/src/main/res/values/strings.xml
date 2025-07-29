@@ -46,4 +46,6 @@
     <string name="sort_price_desc">Sort by Price (High to Low)</string>
     <string name="sort_name_asc">Sort by Name (A to Z)</string>
     <string name="sort_name_desc">Sort by Name (Z to A)</string>
+    <string name="clear_filter"> Clear filter</string>
+
 </resources>
