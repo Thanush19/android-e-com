@@ -41,4 +41,9 @@
     <string name="product_name">Product Name</string>
     <string name="menu_my_feed">My Feed</string>
     <string name="menu_my_profile">My Profile</string>
+    <string name="filter_icon_description">Filter products</string>
+    <string name="sort_price_asc">Sort by Price (Low to High)</string>
+    <string name="sort_price_desc">Sort by Price (High to Low)</string>
+    <string name="sort_name_asc">Sort by Name (A to Z)</string>
+    <string name="sort_name_desc">Sort by Name (Z to A)</string>
 </resources>

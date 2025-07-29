@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.ecommerce.R
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
 import com.example.ecommerce.views.adapters.ProductAdapter
 import com.example.ecommerce.views.adapters.ProductAdapter.LayoutType
@@ -32,7 +34,6 @@ class MyFeedFragment : Fragment() {
     private val batchSize = 3
     private var isLoading = false
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,6 +48,7 @@ class MyFeedFragment : Fragment() {
 
         setupRecyclerViews()
         setupScrollListeners()
+        setupFilter()
         observeViewModel()
         fetchNextBatch()
     }
@@ -99,6 +101,32 @@ class MyFeedFragment : Fragment() {
         })
     }
 
+    private fun setupFilter() {
+        binding.ivFilter.setOnClickListener { view ->
+            val popupMenu = PopupMenu(requireContext(), view)
+            popupMenu.menuInflater.inflate(R.menu.menu_filter, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener { item ->
+                val currentProducts = vm.allProducts.value?.toMutableList() ?: mutableListOf()
+                if (currentProducts.isNotEmpty()) {
+                    val sortedProducts = when (item.itemId) {
+                        R.id.sort_price_asc -> currentProducts.sortedBy { it.price }
+                        R.id.sort_price_desc -> currentProducts.sortedByDescending { it.price }
+                        R.id.sort_name_asc -> currentProducts.sortedBy { it.title }
+                        R.id.sort_name_desc -> currentProducts.sortedByDescending { it.title }
+                        else -> currentProducts
+                    }
+                    verticalProductAdapter.updateProducts(sortedProducts)
+                    horizontalProductAdapter.updateProducts(sortedProducts)
+                    binding.rvProducts.scrollToPosition(0)
+                    binding.rvHorizontalProducts.scrollToPosition(0)
+                } else {
+                    Toast.makeText(requireContext(), "No products avl.", Toast.LENGTH_SHORT).show()
+                }
+                true
+            }
+            popupMenu.show()
+        }
+    }
     private fun fetchNextBatch() {
         if (isLoading || currentProductId > maxProductId) return
 

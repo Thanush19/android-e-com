@@ -18,6 +18,9 @@ class MyFeedViewModel @Inject constructor(
     private val _products = MutableLiveData<List<Product>?>()
     val products: LiveData<List<Product>?> = _products
 
+    private val _allProducts = MutableLiveData<List<Product>>(emptyList())
+    val allProducts: LiveData<List<Product>> = _allProducts
+
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -41,11 +44,17 @@ class MyFeedViewModel @Inject constructor(
                 }
                 if (fetchedProducts.isNotEmpty()) {
                     _products.value = fetchedProducts
+                    val currentAllProducts = _allProducts.value?.toMutableList() ?: mutableListOf()
+                    val filteredNewProducts = fetchedProducts.filter { product ->
+                        !currentAllProducts.any { p -> p.id == product.id }
+                    }
+                    currentAllProducts.addAll(filteredNewProducts)
+                    _allProducts.value = currentAllProducts
                 } else if (_error.value == null) {
                     _error.value = "No products fetched"
                 }
             } catch (e: Exception) {
-                _error.value = e.message
+                _error.value = e.message ?: "An error occurred"
             } finally {
                 _isLoading.value = false
             }
