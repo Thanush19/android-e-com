@@ -1,7 +1,5 @@
 package com.example.ecommerce.views.auth
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
@@ -19,15 +17,14 @@ class AuthViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
-    private val _loginState = MutableLiveData<AuthState>()
-    val loginState: LiveData<AuthState> = _loginState
+    private val _loginState = MutableStateFlow<AuthState?>(null)
+    val loginState: StateFlow<AuthState?> = _loginState.asStateFlow()
 
-    private val _registerState = MutableLiveData<AuthState>()
-    val registerState: LiveData<AuthState> = _registerState
+    private val _registerState = MutableStateFlow<AuthState?>(null)
+    val registerState: StateFlow<AuthState?> = _registerState.asStateFlow()
 
     private val _loggedIn = MutableStateFlow<Boolean>(false)
     val loggedIn: StateFlow<Boolean> = _loggedIn.asStateFlow()
-
 
     init {
         checkAuthState()
@@ -91,6 +88,7 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
+
 }
 
 sealed class AuthState {

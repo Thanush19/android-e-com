@@ -3,6 +3,9 @@ package com.example.ecommerce
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -10,8 +13,6 @@ import com.example.ecommerce.databinding.ActivityMainBinding
 import com.example.ecommerce.views.auth.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -28,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.fragmentContainer) as? NavHostFragment
-            ?: throw IllegalStateException("fragment not found")
+            ?: throw IllegalStateException("NavHostFragment not found for layout fielr")
         navController = navHostFragment.navController
 
         binding.bottomNavigation.setupWithNavController(navController)
@@ -74,15 +75,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeAuthState() {
         lifecycleScope.launch {
-            vm.loggedIn.collectLatest { isLoggedIn ->
-                val currentDestination = navController.currentDestination?.id
-                if (isLoggedIn && currentDestination != R.id.myFeedFragment) {
-                    navController.navigate(R.id.myFeedFragment)
-                } else if (!isLoggedIn && currentDestination != R.id.loginFragment) {
-                    navController.navigate(R.id.loginFragment)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.loggedIn.collect { isLoggedIn ->
+                    val currentDestination = navController.currentDestination?.id
+                    if (isLoggedIn && currentDestination != R.id.myFeedFragment) {
+                        navController.navigate(R.id.myFeedFragment)
+                    } else if (!isLoggedIn && currentDestination != R.id.loginFragment) {
+                        navController.navigate(R.id.loginFragment)
+                    }
                 }
             }
         }
-
     }
 }

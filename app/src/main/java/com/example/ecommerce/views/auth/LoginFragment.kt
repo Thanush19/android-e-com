@@ -1,6 +1,5 @@
 package com.example.ecommerce.views.auth
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,11 +7,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.ecommerce.R
 import com.example.ecommerce.databinding.FragmentLoginBinding
-import com.example.ecommerce.views.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -48,21 +50,28 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.loginState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is AuthState.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.btnLogin.isEnabled = false
-                }
-                is AuthState.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnLogin.isEnabled = true
-                    navigateToHome()
-                }
-                is AuthState.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnLogin.isEnabled = true
-                    Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loginState.collect { state ->
+                    when (state) {
+                        is AuthState.Loading -> {
+                            _binding?.progressBar?.visibility = View.VISIBLE
+                            _binding?.btnLogin?.isEnabled = false
+                        }
+                        is AuthState.Success -> {
+                            _binding?.progressBar?.visibility = View.GONE
+                            _binding?.btnLogin?.isEnabled = true
+                            navigateToHome()
+                        }
+                        is AuthState.Error -> {
+                            _binding?.progressBar?.visibility = View.GONE
+                            _binding?.btnLogin?.isEnabled = true
+                            _binding?.let {
+                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        null -> Unit
+                    }
                 }
             }
         }
