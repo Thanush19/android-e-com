@@ -16,39 +16,66 @@ class MyFeedViewModel @Inject constructor(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    private val _allProducts = MutableStateFlow<List<Product>>(emptyList())
-    val allProducts: StateFlow<List<Product>> = _allProducts.asStateFlow()
+    private val _verticalProducts = MutableStateFlow<List<Product>>(emptyList())
+    val verticalProducts: StateFlow<List<Product>> = _verticalProducts.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    private val _horizontalProducts = MutableStateFlow<List<Product>>(emptyList())
+    val horizontalProducts: StateFlow<List<Product>> = _horizontalProducts.asStateFlow()
+
+    private val _isLoadingVertical = MutableStateFlow(false)
+    val isLoadingVertical: StateFlow<Boolean> = _isLoadingVertical.asStateFlow()
+
+    private val _isLoadingHorizontal = MutableStateFlow(false)
+    val isLoadingHorizontal: StateFlow<Boolean> = _isLoadingHorizontal.asStateFlow()
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
     init {
-        fetchAllProducts()
+        fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
+        fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
     }
 
-    fun fetchAllProducts() {
-        println("DEBUG: fetchAllProducts called, loading: ${_isLoading.value}")
-        if (_isLoading.value) return
-        viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-            try {
-                println("DEBUG: Making API call to get products")
-                val newProducts = productRepository.getAllProducts() ?: emptyList()
-                println("DEBUG: Got ${newProducts.size} new products")
-                val currentList = _allProducts.value.toMutableList()
-                val oldSize = currentList.size
-                currentList.addAll(newProducts)
-                _allProducts.value = currentList
-                println("DEBUG: Total products now: ${currentList.size}, added ${currentList.size - oldSize}")
-            } catch (e: Exception) {
-                println("DEBUG: Error fetching products: ${e.message}")
-                _error.value = e.message ?: "Failed to fetch products"
-            } finally {
-                _isLoading.value = false
+    enum class LayoutType {
+        VERTICAL,
+        HORIZONTAL
+    }
+
+    fun fetchAllProducts(layoutType: LayoutType) {
+        when (layoutType) {
+            LayoutType.VERTICAL -> {
+                if (_isLoadingVertical.value) return
+                viewModelScope.launch {
+                    _isLoadingVertical.value = true
+                    _error.value = null
+                    try {
+                        val newProducts = productRepository.getAllProducts() ?: emptyList()
+                        val currentList = _verticalProducts.value.toMutableList()
+                        currentList.addAll(newProducts)
+                        _verticalProducts.value = currentList
+                    } catch (e: Exception) {
+                        _error.value = e.message ?: "Failed to fetch vertical products"
+                    } finally {
+                        _isLoadingVertical.value = false
+                    }
+                }
+            }
+            LayoutType.HORIZONTAL -> {
+                if (_isLoadingHorizontal.value) return
+                viewModelScope.launch {
+                    _isLoadingHorizontal.value = true
+                    _error.value = null
+                    try {
+                        val newProducts = productRepository.getAllProducts() ?: emptyList()
+                        val currentList = _horizontalProducts.value.toMutableList()
+                        currentList.addAll(newProducts)
+                        _horizontalProducts.value = currentList
+                    } catch (e: Exception) {
+                        _error.value = e.message ?: "Failed to fetch horizontal products"
+                    } finally {
+                        _isLoadingHorizontal.value = false
+                    }
+                }
             }
         }
     }

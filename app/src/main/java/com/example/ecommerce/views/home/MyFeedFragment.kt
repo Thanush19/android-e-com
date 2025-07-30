@@ -15,6 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.ecommerce.R
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
@@ -52,9 +53,9 @@ class MyFeedFragment : Fragment() {
 
         setupRecyclerViews()
         setupFilter()
-        setupScrollListener()
+        setupVerticalScrollListener()
+        setupHorizontalScrollListener()
         observeViewModel()
-
     }
 
     private fun setupRecyclerViews() {
@@ -115,17 +116,26 @@ class MyFeedFragment : Fragment() {
     }
 
     private fun applyFilter(sortOption: Int?) {
-        val allProducts = vm.allProducts.value
-        if (allProducts.isNotEmpty()) {
-            val sortedProducts = when (sortOption) {
-                R.id.sort_price_asc -> allProducts.sortedBy { it.price }
-                R.id.sort_price_desc -> allProducts.sortedByDescending { it.price }
-                R.id.sort_name_asc -> allProducts.sortedBy { it.title }
-                R.id.sort_name_desc -> allProducts.sortedByDescending { it.title }
-                else -> allProducts
+        val verticalProducts = vm.verticalProducts.value
+        val horizontalProducts = vm.horizontalProducts.value
+
+        if (verticalProducts.isNotEmpty() || horizontalProducts.isNotEmpty()) {
+            val sortedVerticalProducts = when (sortOption) {
+                R.id.sort_price_asc ->  verticalProducts.sortedBy { it.price }
+                R.id.sort_price_desc -> verticalProducts.sortedByDescending { it.price }
+                R.id.sort_name_asc -> verticalProducts.sortedBy { it.title }
+                R.id.sort_name_desc -> verticalProducts.sortedByDescending { it.title }
+                else -> verticalProducts
             }
-            verticalProductAdapter.updateProducts(sortedProducts)
-            horizontalProductAdapter.updateProducts(sortedProducts)
+            val sortedHorizontalProducts = when (sortOption) {
+                R.id.sort_price_asc -> horizontalProducts.sortedBy { it.price }
+                R.id.sort_price_desc -> horizontalProducts.sortedByDescending { it.price }
+                R.id.sort_name_asc -> horizontalProducts.sortedBy { it.title }
+                R.id.sort_name_desc -> horizontalProducts.sortedByDescending { it.title }
+                else -> horizontalProducts
+            }
+            verticalProductAdapter.updateProducts(sortedVerticalProducts)
+            horizontalProductAdapter.updateProducts(sortedHorizontalProducts)
             binding.rvProducts.scrollToPosition(0)
             binding.rvHorizontalProducts.scrollToPosition(0)
         } else {
@@ -138,37 +148,56 @@ class MyFeedFragment : Fragment() {
         findNavController().navigate(action)
     }
 
-    private fun setupScrollListener() {
-        binding.nestedScrollView.setOnScrollChangeListener { v, _, scrollY, _, oldScrollY ->
+    private fun setupVerticalScrollListener() {
+        binding.nestedScrollView.setOnScrollChangeListener { v, _, scrollY, _, _ ->
             val nestedScrollView = v as NestedScrollView
             val child = nestedScrollView.getChildAt(0)
             val childHeight = child.height
             val scrollViewHeight = nestedScrollView.height
-            val isLoading = vm.isLoading.value
 
-
-            if (!isLoading && scrollY >= childHeight - scrollViewHeight - 200) {
-                vm.fetchAllProducts()
+            if (!vm.isLoadingVertical.value && scrollY >= childHeight - scrollViewHeight - 200) {
+                vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
             }
         }
+    }
+
+    private fun setupHorizontalScrollListener() {
+        binding.rvHorizontalProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+
+                if (!vm.isLoadingHorizontal.value && lastVisibleItem >= totalItemCount - 2) {
+                    vm.fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
+                }
+            }
+        })
     }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    vm.allProducts.collect { products ->
+                    vm.verticalProducts.collect { products ->
                         applyFilter(currentSortOption)
-
                     }
                 }
-
                 launch {
-                    vm.isLoading.collect { loading ->
-                        binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+                    vm.horizontalProducts.collect { products ->
+                        applyFilter(currentSortOption)
                     }
                 }
-
+                launch {
+                    vm.isLoadingVertical.collect { loading ->
+                        binding.progressBar.visibility = if (loading || vm.isLoadingHorizontal.value) View.VISIBLE else View.GONE
+                    }
+                }
+                launch {
+                    vm.isLoadingHorizontal.collect { loading ->
+                        binding.progressBar.visibility = if (loading || vm.isLoadingVertical.value) View.VISIBLE else View.GONE
+                    }
+                }
                 launch {
                     vm.error.collect { errorMessage ->
                         errorMessage?.let {
@@ -182,6 +211,9 @@ class MyFeedFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.nestedScrollView.setOnScrollChangeListener(null as NestedScrollView.OnScrollChangeListener?)
+        binding.rvHorizontalProducts.clearOnScrollListeners()
+        binding.rvProducts.clearOnScrollListeners()
         _binding = null
     }
 }
