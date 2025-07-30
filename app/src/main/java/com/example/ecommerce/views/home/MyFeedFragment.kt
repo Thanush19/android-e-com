@@ -54,7 +54,6 @@ class MyFeedFragment : Fragment() {
         setupVerticalScrollListener()
         setupHorizontalScrollListener()
         observeViewModel()
-
     }
 
     private fun setupRecyclerViews() {
