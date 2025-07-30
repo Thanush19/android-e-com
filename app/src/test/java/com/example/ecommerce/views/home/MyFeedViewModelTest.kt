@@ -12,12 +12,12 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.Assert.*
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnit
 import org.mockito.junit.MockitoRule
-import junit.framework.TestCase.*
-import kotlin.collections.emptyList
+import com.example.ecommerce.R
 
 
 @ExperimentalCoroutinesApi
@@ -30,7 +30,7 @@ class MyFeedViewModelTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
-    private lateinit var productRepository: ProductRepository
+    private lateinit var productRepo: ProductRepository
 
     private lateinit var vm: MyFeedViewModel
 
@@ -49,7 +49,7 @@ class MyFeedViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        vm = MyFeedViewModel(productRepository)
+        vm = MyFeedViewModel(productRepo)
     }
 
     @After
@@ -60,10 +60,11 @@ class MyFeedViewModelTest {
     @Test
     fun `fetchAllProducts for vertical scroll - successful fetch updates products and loading state`() = runTest {
         val expectedProducts = listOf(testProduct)
-        `when`(productRepository.getAllProducts()).thenReturn(expectedProducts)
+        `when`(productRepo.getAllProducts()).thenReturn(expectedProducts)
 
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
         advanceUntilIdle()
+
         assertFalse(vm.isLoadingVertical.first())
         assertEquals(expectedProducts, vm.verticalProducts.first())
         assertNull(vm.error.first())
@@ -72,11 +73,11 @@ class MyFeedViewModelTest {
     @Test
     fun `fetchAllProducts for horizontal scroll - successful fetch updates products and loading state`() = runTest {
         val expectedProducts = listOf(testProduct)
-        `when`(productRepository.getAllProducts()).thenReturn(expectedProducts)
+        `when`(productRepo.getAllProducts()).thenReturn(expectedProducts)
 
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
-
         advanceUntilIdle()
+
         assertFalse(vm.isLoadingHorizontal.first())
         assertEquals(expectedProducts, vm.horizontalProducts.first())
         assertNull(vm.error.first())
@@ -84,11 +85,10 @@ class MyFeedViewModelTest {
 
     @Test
     fun `fetchAllProducts vertical - repository returns null, sets empty list`() = runTest {
-        `when`(productRepository.getAllProducts()).thenReturn(null)
+        `when`(productRepo.getAllProducts()).thenReturn(null)
 
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
 
-        advanceUntilIdle()
         assertFalse(vm.isLoadingVertical.first())
         assertEquals(emptyList<Product>(), vm.verticalProducts.first())
         assertNull(vm.error.first())
@@ -96,43 +96,71 @@ class MyFeedViewModelTest {
 
     @Test
     fun `fetchAllProducts horizontal - repository throws exception, sets error`() = runTest {
-        val exceptionMessage = "Network error"
-        `when`(productRepository.getAllProducts()).thenThrow(RuntimeException(exceptionMessage))
+        val exceptionMsg = "nw err"
+        `when`(productRepo.getAllProducts()).thenThrow(RuntimeException(exceptionMsg))
 
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
 
-        advanceUntilIdle()
         assertFalse(vm.isLoadingHorizontal.first())
         assertEquals(emptyList<Product>(), vm.horizontalProducts.first())
-        assertEquals(exceptionMessage, vm.error.first())
+        assertEquals(exceptionMsg, vm.error.first())
     }
 
     @Test
     fun `fetchAllProducts - init calls both vertical and horizontal fetches`() = runTest {
         val expectedProducts = listOf(testProduct)
-        `when`(productRepository.getAllProducts()).thenReturn(expectedProducts)
+        `when`(productRepo.getAllProducts()).thenReturn(expectedProducts)
 
-        vm = MyFeedViewModel(productRepository)
+        vm = MyFeedViewModel(productRepo)
 
-        advanceUntilIdle()
         assertEquals(expectedProducts, vm.verticalProducts.first())
         assertEquals(expectedProducts, vm.horizontalProducts.first())
+        assertFalse(vm.isLoadingVertical.first())
+        assertFalse(vm.isLoadingHorizontal.first())
+        assertNull(vm.error.first())
     }
 
     @Test
     fun `fetchAllProducts vertical - multiple fetches append products`() = runTest {
         val firstBatch = listOf(testProduct)
-        val secondBatch = listOf(testProduct.copy(id = 2))
-        `when`(productRepository.getAllProducts())
+        val secondBatch = listOf(testProduct.copy(id = 2, title = "Product 2"))
+        `when`(productRepo.getAllProducts())
             .thenReturn(firstBatch)
             .thenReturn(secondBatch)
 
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
-        advanceUntilIdle()
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
-        advanceUntilIdle()
 
-        val expected = listOf(testProduct, testProduct.copy(id = 2))
+        val expected = listOf(testProduct, testProduct.copy(id = 2, title = "Product 2"))
         assertEquals(expected, vm.verticalProducts.first())
+        assertFalse(vm.isLoadingVertical.first())
+        assertNull(vm.error.first())
+    }
+
+    @Test
+    fun `setSortOption - sets sort option correctly`() = runTest {
+        val sortOption = R.id.sort_price_asc
+        vm.setSortOption(sortOption)
+        assertEquals(sortOption, vm.sortOption.first())
+    }
+
+    @Test
+    fun `setSortOption - clears sort option when null is passed`() = runTest {
+        vm.setSortOption(R.id.sort_price_desc)
+        assertEquals(R.id.sort_price_desc, vm.sortOption.first())
+        vm.setSortOption(null)
+        assertNull(vm.sortOption.first())
+    }
+
+    @Test
+    fun `setSortOption - multiple calls update sort option correctly`() = runTest {
+        val sortOption1 = R.id.sort_price_asc
+        val sortOption2 = R.id.sort_name_asc
+
+        vm.setSortOption(sortOption1)
+        assertEquals(sortOption1, vm.sortOption.first())
+
+        vm.setSortOption(sortOption2)
+        assertEquals(sortOption2, vm.sortOption.first())
     }
 }

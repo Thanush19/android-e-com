@@ -36,7 +36,7 @@ class MyFeedFragment : Fragment() {
     lateinit var userPreferencesRepository: UserPreferencesRepository
     private lateinit var verticalProductAdapter: ProductAdapter
     private lateinit var horizontalProductAdapter: ProductAdapter
-    private var currentSortOption: Int? = null
+    private var crntSortOptions: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -82,20 +82,20 @@ class MyFeedFragment : Fragment() {
         binding.ivFilter.setOnClickListener { view ->
             val popupMenu = PopupMenu(requireContext(), view)
             popupMenu.menuInflater.inflate(R.menu.menu_filter, popupMenu.menu)
-            popupMenu.menu.findItem(R.id.clear_filter)?.isVisible = currentSortOption != null
+            popupMenu.menu.findItem(R.id.clear_filter)?.isVisible = crntSortOptions != null
             popupMenu.setOnMenuItemClickListener { item ->
                 viewLifecycleOwner.lifecycleScope.launch {
                     when (item.itemId) {
                         R.id.clear_filter -> {
                             vm.setSortOption(null)
-                            currentSortOption = null
+                            crntSortOptions = null
                         }
                         else -> {
                             vm.setSortOption(item.itemId)
-                            currentSortOption = item.itemId
+                            crntSortOptions = item.itemId
                         }
                     }
-                    applyFilter(currentSortOption)
+                    applyFilter(crntSortOptions)
                 }
                 true
             }
@@ -105,7 +105,7 @@ class MyFeedFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 vm.sortOption.collectLatest { sortOption ->
-                    currentSortOption = sortOption
+                    crntSortOptions = sortOption
                     applyFilter(sortOption)
                 }
             }
@@ -136,7 +136,7 @@ class MyFeedFragment : Fragment() {
             binding.rvProducts.scrollToPosition(0)
             binding.rvHorizontalProducts.scrollToPosition(0)
         } else {
-            Toast.makeText(requireContext(), "No products available.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "No products avl...", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -165,12 +165,12 @@ class MyFeedFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     vm.verticalProducts.collect { products ->
-                        applyFilter(currentSortOption)
+                        applyFilter(crntSortOptions)
                     }
                 }
                 launch {
                     vm.horizontalProducts.collect { products ->
-                        applyFilter(currentSortOption)
+                        applyFilter(crntSortOptions)
                     }
                 }
                 launch {
