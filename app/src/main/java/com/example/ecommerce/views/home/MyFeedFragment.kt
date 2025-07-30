@@ -20,7 +20,6 @@ import com.example.ecommerce.R
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
 import com.example.ecommerce.views.adapters.ProductAdapter
-import com.example.ecommerce.views.adapters.ProductAdapter.LayoutType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -50,20 +49,20 @@ class MyFeedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerViews()
         setupFilter()
         setupVerticalScrollListener()
         setupHorizontalScrollListener()
         observeViewModel()
+
     }
 
     private fun setupRecyclerViews() {
-        horizontalProductAdapter = ProductAdapter(LayoutType.HORIZONTAL) { productId ->
+        horizontalProductAdapter = ProductAdapter { productId ->
             navigateToProductDetails(productId)
         }
 
-        verticalProductAdapter = ProductAdapter(LayoutType.VERTICAL) { productId ->
+        verticalProductAdapter = ProductAdapter { productId ->
             navigateToProductDetails(productId)
         }
 
@@ -89,16 +88,15 @@ class MyFeedFragment : Fragment() {
                 viewLifecycleOwner.lifecycleScope.launch {
                     when (item.itemId) {
                         R.id.clear_filter -> {
-                            userPreferencesRepository.clearSortOption()
+                            vm.setSortOption(null)
                             currentSortOption = null
-                            applyFilter(null)
                         }
                         else -> {
-                            userPreferencesRepository.saveSortOption(item.itemId)
+                            vm.setSortOption(item.itemId)
                             currentSortOption = item.itemId
-                            applyFilter(item.itemId)
                         }
                     }
+                    applyFilter(currentSortOption)
                 }
                 true
             }
@@ -107,7 +105,7 @@ class MyFeedFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                userPreferencesRepository.sortOption.collectLatest { sortOption ->
+                vm.sortOption.collectLatest { sortOption ->
                     currentSortOption = sortOption
                     applyFilter(sortOption)
                 }
@@ -121,7 +119,7 @@ class MyFeedFragment : Fragment() {
 
         if (verticalProducts.isNotEmpty() || horizontalProducts.isNotEmpty()) {
             val sortedVerticalProducts = when (sortOption) {
-                R.id.sort_price_asc ->  verticalProducts.sortedBy { it.price }
+                R.id.sort_price_asc -> verticalProducts.sortedBy { it.price }
                 R.id.sort_price_desc -> verticalProducts.sortedByDescending { it.price }
                 R.id.sort_name_asc -> verticalProducts.sortedBy { it.title }
                 R.id.sort_name_desc -> verticalProducts.sortedByDescending { it.title }
@@ -142,6 +140,7 @@ class MyFeedFragment : Fragment() {
             Toast.makeText(requireContext(), "No products available.", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     private fun navigateToProductDetails(productId: Int) {
         val action = MyFeedFragmentDirections.actionMyFeedFragmentToProductDetailsFragment(productId)

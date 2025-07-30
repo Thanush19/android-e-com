@@ -12,13 +12,8 @@ import com.example.ecommerce.databinding.ItemLoaderBinding
 import java.util.Locale
 
 class ProductAdapter(
-    private val layoutType: LayoutType = LayoutType.VERTICAL,
     private val onProductClick: (Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    enum class LayoutType {
-        VERTICAL,
-        HORIZONTAL
-    }
 
     private val products: MutableList<Product> = mutableListOf()
 

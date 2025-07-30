@@ -31,14 +31,21 @@ class MyFeedViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private val _sortOption = MutableStateFlow<Int?>(null)
+    val sortOption: StateFlow<Int?> = _sortOption.asStateFlow()
+
     init {
-        fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
-        fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
+        fetchAllProducts(LayoutType.VERTICAL)
+        fetchAllProducts(LayoutType.HORIZONTAL)
     }
 
     enum class LayoutType {
         VERTICAL,
         HORIZONTAL
+    }
+
+    fun setSortOption(sortOption: Int?) {
+        _sortOption.value = sortOption
     }
 
     fun fetchAllProducts(layoutType: LayoutType) {
@@ -54,7 +61,7 @@ class MyFeedViewModel @Inject constructor(
                         currentList.addAll(newProducts)
                         _verticalProducts.value = currentList
                     } catch (e: Exception) {
-                        _error.value = e.message ?: "Failed to fetch vertical products"
+                        _error.value = e.message
                     } finally {
                         _isLoadingVertical.value = false
                     }
@@ -71,7 +78,7 @@ class MyFeedViewModel @Inject constructor(
                         currentList.addAll(newProducts)
                         _horizontalProducts.value = currentList
                     } catch (e: Exception) {
-                        _error.value = e.message ?: "Failed to fetch horizontal products"
+                        _error.value = e.message
                     } finally {
                         _isLoadingHorizontal.value = false
                     }

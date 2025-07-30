@@ -16,7 +16,6 @@ class UserPreferencesRepository(private val context: Context) {
 
     companion object {
         private val USER_ID_KEY = longPreferencesKey("user_id")
-        private val SORT_OPTION_KEY = intPreferencesKey("sort_option")
     }
 
     val userId: Flow<Long?> = context.dataStore.data.map { preferences ->
@@ -27,9 +26,6 @@ class UserPreferencesRepository(private val context: Context) {
         id != null
     }
 
-    val sortOption: Flow<Int?> = context.dataStore.data.map { preferences ->
-        preferences[SORT_OPTION_KEY]
-    }
 
     suspend fun saveUserId(userId: Long) {
         context.dataStore.edit { preferences ->
@@ -43,15 +39,4 @@ class UserPreferencesRepository(private val context: Context) {
         }
     }
 
-    suspend fun saveSortOption(sortOption: Int) {
-        context.dataStore.edit { preferences ->
-            preferences[SORT_OPTION_KEY] = sortOption
-        }
-    }
-
-    suspend fun clearSortOption() {
-        context.dataStore.edit { preferences ->
-            preferences.remove(SORT_OPTION_KEY)
-        }
-    }
 }
