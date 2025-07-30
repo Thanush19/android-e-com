@@ -161,19 +161,6 @@ class MyFeedFragment : Fragment() {
         }
     }
 
-    private fun setupHorizontalScrollListener() {
-        binding.rvHorizontalProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
-                val totalItemCount = layoutManager.itemCount
-                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
-
-                if (!vm.isLoadingHorizontal.value && lastVisibleItem >= totalItemCount - 2) {
-                    vm.fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
-                }
-            }
-        })
-    }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -207,6 +194,22 @@ class MyFeedFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun setupHorizontalScrollListener() {
+        binding.rvHorizontalProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val scrollOffset = recyclerView.computeHorizontalScrollOffset()
+                val scrollExtent = recyclerView.computeHorizontalScrollExtent()
+                val scrollRange = recyclerView.computeHorizontalScrollRange()
+
+                val distanceFromEnd = scrollRange - (scrollOffset + scrollExtent)
+
+                if (!vm.isLoadingHorizontal.value && distanceFromEnd < 200) {
+                    vm.fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
+                }
+            }
+        })
     }
 
     override fun onDestroyView() {
