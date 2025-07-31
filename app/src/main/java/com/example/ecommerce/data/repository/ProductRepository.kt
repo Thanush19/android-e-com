@@ -10,7 +10,7 @@ class ProductRepository(private val productApiService: ProductApiService) {
     }
 
     suspend fun getProductById(id: Int): Product?  {
-        return    productApiService.getProductById(id).body()
+        return productApiService.getProductById(id).body()
     }
 }
 

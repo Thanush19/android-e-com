@@ -135,8 +135,6 @@ class MyFeedFragment : Fragment() {
             horizontalProductAdapter.updateProducts(sortedHorizontalProducts)
             binding.rvProducts.scrollToPosition(0)
             binding.rvHorizontalProducts.scrollToPosition(0)
-        } else {
-            Toast.makeText(requireContext(), "No products avl...", Toast.LENGTH_SHORT).show()
         }
     }
 

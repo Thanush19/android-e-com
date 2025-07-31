@@ -17,6 +17,7 @@ import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.data.repository.OrdersRepository
 import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.databinding.FragmentProductDetailsBinding
+import com.example.ecommerce.views.productdetails.ProductDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -37,6 +38,9 @@ class ProductDetailsFragment : Fragment() {
     @Inject
     lateinit var userPreferencesRepository: UserPreferencesRepository
 
+    @Inject
+    lateinit var productDetailsViewModel: ProductDetailsViewModel
+
     private val args: ProductDetailsFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -54,7 +58,7 @@ class ProductDetailsFragment : Fragment() {
         val productId = args.productId
 
         lifecycleScope.launch {
-            val product = productRepository.getProductById(productId)
+            val product = productDetailsViewModel.getProductById(productId)
             if (product != null) {
                 binding.tvProductTitle.text = product.title
                 binding.tvProductPrice.text = getString(R.string.product_price, product.price)

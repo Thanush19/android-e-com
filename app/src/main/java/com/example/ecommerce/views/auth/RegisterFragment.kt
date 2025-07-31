@@ -92,7 +92,7 @@ class RegisterFragment : Fragment() {
                     navOptions
                 )
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             findNavController().navigate(R.id.loginFragment)
             findNavController().navigate(R.id.action_loginFragment_to_myFeedFragment)
         }

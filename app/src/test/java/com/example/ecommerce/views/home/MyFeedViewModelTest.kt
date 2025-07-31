@@ -139,7 +139,7 @@ class MyFeedViewModelTest {
 
     @Test
     fun `setSortOption - sets sort option correctly`() = runTest {
-        val sortOption = R.id.sort_price_asc
+        val sortOption = 2
         vm.setSortOption(sortOption)
         assertEquals(sortOption, vm.sortOption.first())
     }
@@ -154,8 +154,8 @@ class MyFeedViewModelTest {
 
     @Test
     fun `setSortOption - multiple calls update sort option correctly`() = runTest {
-        val sortOption1 = R.id.sort_price_asc
-        val sortOption2 = R.id.sort_name_asc
+        val sortOption1 = 1
+        val sortOption2 = 2
 
         vm.setSortOption(sortOption1)
         assertEquals(sortOption1, vm.sortOption.first())

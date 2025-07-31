@@ -21,7 +21,6 @@ import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.databinding.FragmentMyProfileBinding
 import com.example.ecommerce.views.adapters.OrderDropdownAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
