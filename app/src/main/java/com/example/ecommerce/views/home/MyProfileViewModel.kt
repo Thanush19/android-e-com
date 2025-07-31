@@ -12,7 +12,6 @@ import com.example.ecommerce.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,12 +31,18 @@ class MyProfileViewModel @Inject constructor(
         loadUserData()
     }
 
-    private fun loadUserData() {
+
+
+     fun loadUserData() {
         viewModelScope.launch {
-            userPreferencesRepository.userId.collectLatest { userId ->
+            userPreferencesRepository.userId.collect { userId ->
                 if (userId != null) {
-                    val user = userRepository.getUserById(userId)
-                    _currentUser.value = user
+                    try {
+                        val user = userRepository.getUserById(userId)
+                        _currentUser.value = user
+                    } catch (e: Exception) {
+                        _currentUser.value = null
+                    }
                 } else {
                     _currentUser.value = null
                 }
@@ -46,7 +51,8 @@ class MyProfileViewModel @Inject constructor(
     }
 
     suspend fun getOrdersByUser(userId: Long): List<Order>? {
-        return ordersRepository.getOrdersByUser(userId).firstOrNull()
+
+           return  ordersRepository.getOrdersByUser(userId).firstOrNull()
     }
 
     suspend fun getProductById(productId:Int) : Product? {
