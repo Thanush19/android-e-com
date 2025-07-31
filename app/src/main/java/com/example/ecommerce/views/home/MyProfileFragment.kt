@@ -74,7 +74,7 @@ class MyProfileFragment : Fragment() {
         binding.tvMyOrders.setOnClickListener {
             vm.currentUser.value?.let { user ->
                 lifecycleScope.launch {
-                    val orders = ordersRepository.getOrdersByUser(user.id).firstOrNull()
+                    val orders = vm.getOrdersByUser(user.id)
                     if (orders.isNullOrEmpty()) {
                         Toast.makeText(context, getString(R.string.no_orders_found), Toast.LENGTH_SHORT).show()
                         return@launch
@@ -83,7 +83,7 @@ class MyProfileFragment : Fragment() {
 
                     val products = mutableListOf<Product>()
                     for (productId in productIds) {
-                        productRepository.getProductById(productId)?.let { product ->
+                        vm.getProductById(productId)?.let { product ->
                             products.add(product)
                         }
                     }

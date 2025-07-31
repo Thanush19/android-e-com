@@ -123,7 +123,7 @@ class MyFeedViewModelTest {
     @Test
     fun `fetchAllProducts vertical - multiple fetches append products`() = runTest {
         val firstBatch = listOf(testProduct)
-        val secondBatch = listOf(testProduct.copy(id = 2, title = "Product 2"))
+        val secondBatch = listOf(testProduct.copy(id = 2, title = "pro 2"))
         `when`(productRepo.getAllProducts())
             .thenReturn(firstBatch)
             .thenReturn(secondBatch)
@@ -131,7 +131,7 @@ class MyFeedViewModelTest {
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
 
-        val expected = listOf(testProduct, testProduct.copy(id = 2, title = "Product 2"))
+        val expected = listOf(testProduct, testProduct.copy(id = 2, title = "pro 2"))
         assertEquals(expected, vm.verticalProducts.first())
         assertFalse(vm.isLoadingVertical.first())
         assertNull(vm.error.first())

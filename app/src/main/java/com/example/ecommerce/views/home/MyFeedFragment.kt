@@ -31,7 +31,7 @@ class MyFeedFragment : Fragment() {
     private var _binding: FragmentMyFeedBinding? = null
     private val binding get() = _binding!!
 
-    private val vm: MyFeedViewModel by viewModels()
+    val vm: MyFeedViewModel by viewModels()
     @Inject
     lateinit var userPreferencesRepository: UserPreferencesRepository
     private lateinit var verticalProductAdapter: ProductAdapter
@@ -112,7 +112,7 @@ class MyFeedFragment : Fragment() {
         }
     }
 
-    private fun applyFilter(sortOption: Int?) {
+    fun applyFilter(sortOption: Int?) {
         val verticalProducts = vm.verticalProducts.value
         val horizontalProducts = vm.horizontalProducts.value
 

@@ -72,19 +72,21 @@ class AuthViewModel @Inject constructor(
             return
         }
 
-        _registerState.value = AuthState.Loading
-        viewModelScope.launch {
-            try {
-                val userId = userRepository.registerUser(username, password)
-                if (userId != null) {
-                    userPreferencesRepository.saveUserId(userId)
-                    _registerState.value = AuthState.Success
-                    _loggedIn.value = true
-                } else {
-                    _registerState.value = AuthState.Error("Username already exists")
+        if (_registerState.value !is AuthState.Loading) {
+            _registerState.value = AuthState.Loading
+            viewModelScope.launch {
+                try {
+                    val userId = userRepository.registerUser(username, password)
+                    if (userId != null) {
+                        userPreferencesRepository.saveUserId(userId)
+                        _registerState.value = AuthState.Success
+                        _loggedIn.value = true
+                    } else {
+                        _registerState.value = AuthState.Error("Username already exists")
+                    }
+                } catch (e: Exception) {
+                    _registerState.value = AuthState.Error("Registration failed: ${e.message}")
                 }
-            } catch (e: Exception) {
-                _registerState.value = AuthState.Error("Registration failed: ${e.message}")
             }
         }
     }

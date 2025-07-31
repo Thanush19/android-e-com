@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.example.ecommerce.R
 import com.example.ecommerce.databinding.FragmentRegisterBinding
@@ -79,7 +80,22 @@ class RegisterFragment : Fragment() {
     }
 
     private fun navigateToHome() {
-        findNavController().navigate(R.id.action_registerFragment_to_myFeedFragment)
+        val navOptions = NavOptions.Builder()
+            .setPopUpTo(R.id.loginFragment, true)
+            .build()
+
+        try {
+            if (findNavController().currentDestination?.id == R.id.registerFragment) {
+                findNavController().navigate(
+                    R.id.action_registerFragment_to_myFeedFragment,
+                    null,
+                    navOptions
+                )
+            }
+        } catch (e: Exception) {
+            findNavController().navigate(R.id.loginFragment)
+            findNavController().navigate(R.id.action_loginFragment_to_myFeedFragment)
+        }
     }
 
     override fun onDestroyView() {
