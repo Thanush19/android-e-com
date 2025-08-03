@@ -68,6 +68,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.48")
     implementation(libs.filament.android)
     implementation(libs.androidx.runtime)
+    testImplementation(libs.junit.junit)
     kapt("com.google.dagger:hilt-android-compiler:2.48")
     implementation("androidx.hilt:hilt-navigation-fragment:1.1.0")
     kapt(libs.room.compiler)
