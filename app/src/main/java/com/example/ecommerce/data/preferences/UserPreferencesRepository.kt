@@ -26,7 +26,6 @@ class UserPreferencesRepository(private val context: Context) {
         id != null
     }
 
-
     suspend fun saveUserId(userId: Long) {
         context.dataStore.edit { preferences ->
             preferences[USER_ID_KEY] = userId
@@ -38,5 +37,4 @@ class UserPreferencesRepository(private val context: Context) {
             preferences.remove(USER_ID_KEY)
         }
     }
-
 }

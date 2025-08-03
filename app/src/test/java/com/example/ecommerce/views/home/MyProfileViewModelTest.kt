@@ -1,7 +1,5 @@
 package com.example.ecommerce.views.home
 
-
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.ecommerce.data.db.entity.Order
 import com.example.ecommerce.data.db.entity.User
 import com.example.ecommerce.data.model.Product
@@ -12,38 +10,48 @@ import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.*
 import org.junit.Assert.*
-import kotlinx.coroutines.test.StandardTestDispatcher
-
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnit
+import org.mockito.junit.MockitoRule
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class MyProfileViewModelTest {
 
     @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
+    val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
+    @Mock
     private lateinit var userRepository: UserRepository
+    @Mock
     private lateinit var userPreferencesRepository: UserPreferencesRepository
+    @Mock
     private lateinit var ordersRepository: OrdersRepository
+    @Mock
     private lateinit var productRepository: ProductRepository
+
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var testScope: TestScope
+    private lateinit var vm: MyProfileViewModel
 
     @Before
     fun setUp() {
         testScope = TestScope(testDispatcher)
         Dispatchers.setMain(testDispatcher)
-        userRepository = mock<UserRepository>()
-        userPreferencesRepository = mock<UserPreferencesRepository>()
-        ordersRepository = mock<OrdersRepository>()
-        productRepository = mock<ProductRepository>()
+        vm = MyProfileViewModel(
+            userRepository,
+            userPreferencesRepository,
+            ordersRepository,
+            productRepository
+        )
     }
 
     @After
@@ -56,47 +64,26 @@ class MyProfileViewModelTest {
         val user = User(id = 1L, userName = "abc", password = "123")
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(1L))
         whenever(userRepository.getUserById(1L)).thenReturn(user)
-
-        val viewModel = MyProfileViewModel(
-            userRepository,
-            userPreferencesRepository,
-            ordersRepository,
-            productRepository
-        )
-
+        vm.loadUserData()
         advanceUntilIdle()
-        assertEquals(user, viewModel.currentUser.value)
+        assertEquals(user, vm.currentUser.first())
     }
 
     @Test
     fun `init sets currentUser to null when userId is null`() = runTest(testDispatcher) {
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(null))
-
-        val viewModel = MyProfileViewModel(
-            userRepository,
-            userPreferencesRepository,
-            ordersRepository,
-            productRepository
-        )
-
+        vm.loadUserData()
         advanceUntilIdle()
-        assertNull(viewModel.currentUser.value)
+        assertNull(vm.currentUser.first())
     }
 
     @Test
     fun `init does not crash when userRepository throws exception`() = runTest(testDispatcher) {
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(1L))
         whenever(userRepository.getUserById(1L)).thenThrow(RuntimeException("Database error"))
-
-        val viewModel = MyProfileViewModel(
-            userRepository,
-            userPreferencesRepository,
-            ordersRepository,
-            productRepository
-        )
-
+        vm.loadUserData()
         advanceUntilIdle()
-        assertNull(viewModel.currentUser.value)
+        assertNull(vm.currentUser.first())
         verify(userRepository, times(1)).getUserById(1L)
     }
 
@@ -106,54 +93,27 @@ class MyProfileViewModelTest {
         val orders = listOf(Order(id = 1L, userId = userId, productIds = listOf(101, 102)))
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(userId))
         whenever(ordersRepository.getOrdersByUser(userId)).thenReturn(flowOf(orders))
-
-        val viewModel = MyProfileViewModel(
-            userRepository,
-            userPreferencesRepository,
-            ordersRepository,
-            productRepository
-        )
-
-        val result = viewModel.getOrdersByUser(userId)
-
+        val result = vm.getOrdersByUser(userId)
         advanceUntilIdle()
         assertEquals(orders, result)
     }
 
     @Test
-    fun `getOrdersByUser returns null when no orders found`() = runTest(testDispatcher) {
+    fun `getOrdersByUser returns empty list when no orders found`() = runTest(testDispatcher) {
         val userId = 1L
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(userId))
         whenever(ordersRepository.getOrdersByUser(userId)).thenReturn(flowOf(emptyList()))
-
-        val viewModel= MyProfileViewModel(
-        userRepository,
-        userPreferencesRepository,
-        ordersRepository,
-        productRepository
-        )
-
-        val result = viewModel.getOrdersByUser(userId)
-
+        val result = vm.getOrdersByUser(userId)
         advanceUntilIdle()
         assertEquals(emptyList<Order>(), result)
     }
 
     @Test
-    fun `getOrdersByUser handles orders repo exception `() = runTest(testDispatcher) {
+    fun `getOrdersByUser handles orders repo exception`() = runTest(testDispatcher) {
         val userId = 1L
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(userId))
         whenever(ordersRepository.getOrdersByUser(userId)).thenReturn(flowOf(emptyList()))
-
-        val viewModel = MyProfileViewModel(
-            userRepository,
-            userPreferencesRepository,
-            ordersRepository,
-            productRepository
-        )
-
-        val result = viewModel.getOrdersByUser(userId)
-
+        val result = vm.getOrdersByUser(userId)
         advanceUntilIdle()
         assertEquals(emptyList<Order>(), result)
     }
@@ -172,16 +132,7 @@ class MyProfileViewModelTest {
         )
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(1L))
         whenever(productRepository.getProductById(productId)).thenReturn(product)
-
-        val viewModel = MyProfileViewModel(
-            userRepository,
-            userPreferencesRepository,
-            ordersRepository,
-            productRepository
-        )
-
-        val result = viewModel.getProductById(productId)
-
+        val result = vm.getProductById(productId)
         advanceUntilIdle()
         assertEquals(product, result)
     }
@@ -191,56 +142,27 @@ class MyProfileViewModelTest {
         val productId = 101
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(1L))
         whenever(productRepository.getProductById(productId)).thenReturn(null)
-
-        val viewModel = MyProfileViewModel(
-            userRepository,
-            userPreferencesRepository,
-            ordersRepository,
-            productRepository
-        )
-
-        val result = viewModel.getProductById(productId)
-
+        val result = vm.getProductById(productId)
         advanceUntilIdle()
         assertNull(result)
     }
 
     @Test
-    fun `getProductById handles repository exception `() = runTest(testDispatcher) {
+    fun `getProductById handles repository exception`() = runTest(testDispatcher) {
         val productId = 101
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(1L))
-        whenever(productRepository.getProductById(productId)).thenReturn(null)
-
-        val viewModel = MyProfileViewModel(
-            userRepository,
-            userPreferencesRepository,
-            ordersRepository,
-            productRepository
-        )
-
-        val result = viewModel.getProductById(productId)
-
+        whenever(productRepository.getProductById(productId)).thenThrow(RuntimeException("Product repo error"))
+        val result = vm.getProductById(productId)
         advanceUntilIdle()
         assertNull(result)
-        assertEquals(null, result)
     }
 
     @Test
     fun `logout clears userId in preferences`() = runTest(testDispatcher) {
         whenever(userPreferencesRepository.userId).thenReturn(flowOf(1L))
         whenever(userPreferencesRepository.clearUserId()).thenReturn(Unit)
-
-        val viewModel = MyProfileViewModel(
-            userRepository,
-            userPreferencesRepository,
-            ordersRepository,
-            productRepository
-        )
-
-        viewModel.logout()
-
+        vm.logout()
         advanceUntilIdle()
         verify(userPreferencesRepository, times(1)).clearUserId()
     }
-
 }

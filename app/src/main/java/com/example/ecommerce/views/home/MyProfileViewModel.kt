@@ -9,15 +9,12 @@ import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.data.repository.OrdersRepository
 import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.data.repository.UserRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MyProfileViewModel @Inject constructor(
+class MyProfileViewModel(
     private val userRepository: UserRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val ordersRepository: OrdersRepository,
@@ -27,41 +24,51 @@ class MyProfileViewModel @Inject constructor(
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     init {
         loadUserData()
     }
 
-
-
-     fun loadUserData() {
+    fun loadUserData() {
         viewModelScope.launch {
-            userPreferencesRepository.userId.collect { userId ->
+            try {
+                val userId = userPreferencesRepository.userId.firstOrNull()
                 if (userId != null) {
-                    try {
-                        val user = userRepository.getUserById(userId)
-                        _currentUser.value = user
-                    } catch (e: Exception) {
-                        _currentUser.value = null
-                    }
+                    _currentUser.value = userRepository.getUserById(userId)
                 } else {
                     _currentUser.value = null
                 }
+            } catch (e: Exception) {
+                _currentUser.value = null
+                _error.value = "Failed to load user data: ${e.message}"
             }
         }
     }
 
     suspend fun getOrdersByUser(userId: Long): List<Order>? {
-
-           return  ordersRepository.getOrdersByUser(userId).firstOrNull()
+        return try {
+            ordersRepository.getOrdersByUser(userId).firstOrNull()
+        } catch (e: Exception) {
+            _error.value = "Failed to load orders: ${e.message}"
+            null
+        }
     }
 
-    suspend fun getProductById(productId:Int) : Product? {
-        return productRepository.getProductById(productId)
+    suspend fun getProductById(productId: Int): Product? {
+        return try {
+            productRepository.getProductById(productId)
+        } catch (e: Exception) {
+            _error.value = "Failed to load product: ${e.message}"
+            null
+        }
     }
 
     fun logout() {
         viewModelScope.launch {
             userPreferencesRepository.clearUserId()
+            _currentUser.value = null
         }
     }
 }

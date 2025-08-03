@@ -60,8 +60,8 @@ class MyFeedViewModel @Inject constructor(
                         val currentList = _verticalProducts.value.toMutableList()
                         currentList.addAll(newProducts)
                         _verticalProducts.value = currentList
-                    } catch (e: Exception) {
-                        _error.value = e.message
+                    } catch (_: Exception) {
+                        _error.value = "nw err"
                     } finally {
                         _isLoadingVertical.value = false
                     }

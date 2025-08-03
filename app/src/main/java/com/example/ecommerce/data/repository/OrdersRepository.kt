@@ -3,6 +3,7 @@ package com.example.ecommerce.data.repository
 import com.example.ecommerce.data.db.dao.OrdersDao
 import com.example.ecommerce.data.db.entity.Order
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class OrdersRepository(private val ordersDao: OrdersDao) {
 
@@ -11,6 +12,10 @@ class OrdersRepository(private val ordersDao: OrdersDao) {
     }
 
     fun getOrdersByUser(userId: Long): Flow<List<Order>> {
-        return ordersDao.getOrdersByUser(userId)
+        return try {
+            ordersDao.getOrdersByUser(userId)
+        } catch (_: Exception) {
+            flowOf(emptyList())
+        }
     }
 }

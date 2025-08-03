@@ -1,6 +1,5 @@
 package com.example.ecommerce.views.auth
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.ecommerce.data.db.entity.User
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.data.repository.UserRepository
@@ -15,15 +14,22 @@ import org.junit.Test
 import org.mockito.kotlin.*
 import org.junit.Assert.*
 import kotlinx.coroutines.test.StandardTestDispatcher
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnit
+import org.mockito.junit.MockitoRule
 
 @ExperimentalCoroutinesApi
 class AuthViewModelTest {
 
     @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
+    val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
-    private lateinit var viewModel: AuthViewModel
+    private lateinit var vm: AuthViewModel
+
+    @Mock
     private lateinit var userRepository: UserRepository
+
+    @Mock
     private lateinit var userPreferencesRepository: UserPreferencesRepository
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var testScope: TestScope
@@ -32,10 +38,8 @@ class AuthViewModelTest {
     fun setUp() {
         testScope = TestScope(testDispatcher)
         Dispatchers.setMain(testDispatcher)
-        userRepository = mock<UserRepository>()
-        userPreferencesRepository = mock<UserPreferencesRepository>()
         whenever(userPreferencesRepository.isLoggedIn).thenReturn(flowOf(false))
-        viewModel = AuthViewModel(userRepository, userPreferencesRepository)
+        vm = AuthViewModel(userRepository, userPreferencesRepository)
     }
 
     @After
@@ -46,16 +50,16 @@ class AuthViewModelTest {
     @Test
     fun `init checks auth state from user preferences`() = runTest(testDispatcher) {
         whenever(userPreferencesRepository.isLoggedIn).thenReturn(flowOf(false))
-        viewModel = AuthViewModel(userRepository, userPreferencesRepository)
+        vm = AuthViewModel(userRepository, userPreferencesRepository)
 
-        assertEquals(false, viewModel.loggedIn.value)
+        assertEquals(false, vm.loggedIn.value)
     }
 
     @Test
     fun `login with empty username or password emits error state`() = runTest(testDispatcher) {
-        viewModel.login("", "123")
+        vm.login("", "123")
 
-        assertEquals(AuthState.Error("Username and password can't be empty"), viewModel.loginState.value)
+        assertEquals(AuthState.Error("Username and password can't be empty"), vm.loginState.value)
     }
 
     @Test
@@ -64,12 +68,12 @@ class AuthViewModelTest {
         whenever(userRepository.loginUser("abc")).thenReturn(user)
         whenever(userPreferencesRepository.saveUserId(1L)).thenReturn(Unit)
 
-        viewModel.login("abc", "123")
+        vm.login("abc", "123")
 
-        assertEquals(AuthState.Loading, viewModel.loginState.value)
+        assertEquals(AuthState.Loading, vm.loginState.value)
         advanceUntilIdle()
-        assertEquals(AuthState.Success, viewModel.loginState.value)
-        assertTrue(viewModel.loggedIn.value)
+        assertEquals(AuthState.Success, vm.loginState.value)
+        assertTrue(vm.loggedIn.value)
         verify(userRepository, times(1)).loginUser("abc")
         verify(userPreferencesRepository, times(1)).saveUserId(1L)
     }
@@ -78,11 +82,11 @@ class AuthViewModelTest {
     fun `login with invalid username emits error state`() = runTest(testDispatcher) {
         whenever(userRepository.loginUser("abcd")).thenReturn(null)
 
-        viewModel.login("abcd", "123")
+        vm.login("abcd", "123")
 
-        assertEquals(AuthState.Loading, viewModel.loginState.value)
+        assertEquals(AuthState.Loading, vm.loginState.value)
         advanceUntilIdle()
-        assertEquals(AuthState.Error("Invalid username or password"), viewModel.loginState.value)
+        assertEquals(AuthState.Error("Invalid username or password"), vm.loginState.value)
 
     }
 
@@ -91,36 +95,36 @@ class AuthViewModelTest {
         val user = User(id = 1, userName = "abc", password = "123")
         whenever(userRepository.loginUser("abc")).thenReturn(user)
 
-        viewModel.login("abc", "1234")
+        vm.login("abc", "1234")
 
-        assertEquals(AuthState.Loading, viewModel.loginState.value)
+        assertEquals(AuthState.Loading, vm.loginState.value)
         advanceUntilIdle()
-        assertEquals(AuthState.Error("Invalid username or password"), viewModel.loginState.value)
+        assertEquals(AuthState.Error("Invalid username or password"), vm.loginState.value)
     }
 
     @Test
     fun `login with repository exception emits error state`() = runTest(testDispatcher) {
         whenever(userRepository.loginUser("abc")).thenThrow(RuntimeException("nw err"))
 
-        viewModel.login("abc", "123")
+        vm.login("abc", "123")
 
-        assertEquals(AuthState.Loading, viewModel.loginState.value)
+        assertEquals(AuthState.Loading, vm.loginState.value)
         advanceUntilIdle()
-        assertEquals(AuthState.Error("Login failed: nw err"), viewModel.loginState.value)
+        assertEquals(AuthState.Error("Login failed: nw err"), vm.loginState.value)
     }
 
     @Test
     fun `register with empty fields emits error state`() = runTest(testDispatcher) {
-        viewModel.register("", "123", "123")
+        vm.register("", "123", "123")
 
-        assertEquals(AuthState.Error("All fields are required"), viewModel.registerState.value)
+        assertEquals(AuthState.Error("All fields are required"), vm.registerState.value)
     }
 
     @Test
     fun `register with mismatched passwords emits error state`() = runTest(testDispatcher) {
-        viewModel.register("abc", "123", "1234")
+        vm.register("abc", "123", "1234")
 
-        assertEquals(AuthState.Error("Passwords do not match"), viewModel.registerState.value)
+        assertEquals(AuthState.Error("Passwords do not match"), vm.registerState.value)
 
     }
 
@@ -128,11 +132,11 @@ class AuthViewModelTest {
     fun `register with existing username emits error state`() = runTest(testDispatcher) {
         whenever(userRepository.registerUser("abc", "123")).thenReturn(null)
 
-        viewModel.register("abc", "123", "123")
+        vm.register("abc", "123", "123")
 
-        assertEquals(AuthState.Loading, viewModel.registerState.value)
+        assertEquals(AuthState.Loading, vm.registerState.value)
         advanceUntilIdle()
-        assertEquals(AuthState.Error("Username already exists"), viewModel.registerState.value)
+        assertEquals(AuthState.Error("Username already exists"), vm.registerState.value)
 
     }
 
@@ -141,12 +145,12 @@ class AuthViewModelTest {
         whenever(userRepository.registerUser("abc", "123")).thenReturn(1L)
         whenever(userPreferencesRepository.saveUserId(1L)).thenReturn(Unit)
 
-        viewModel.register("abc", "123", "123")
+        vm.register("abc", "123", "123")
 
-        assertEquals(AuthState.Loading, viewModel.registerState.value)
+        assertEquals(AuthState.Loading, vm.registerState.value)
         advanceUntilIdle()
-        assertEquals(AuthState.Success, viewModel.registerState.value)
-        assertTrue(viewModel.loggedIn.value)
+        assertEquals(AuthState.Success, vm.registerState.value)
+        assertTrue(vm.loggedIn.value)
 
     }
 
@@ -154,11 +158,11 @@ class AuthViewModelTest {
     fun `register with repository exception emits error state`() = runTest(testDispatcher) {
         whenever(userRepository.registerUser("abc", "123")).thenThrow(RuntimeException("Database error"))
 
-        viewModel.register("abc", "123", "123")
+        vm.register("abc", "123", "123")
 
-        assertEquals(AuthState.Loading, viewModel.registerState.value)
+        assertEquals(AuthState.Loading, vm.registerState.value)
         advanceUntilIdle()
-        assertEquals(AuthState.Error("Registration failed: Database error"), viewModel.registerState.value)
+        assertEquals(AuthState.Error("Registration failed: Database error"), vm.registerState.value)
 
     }
 }

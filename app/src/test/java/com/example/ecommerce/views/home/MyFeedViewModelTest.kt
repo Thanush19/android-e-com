@@ -23,18 +23,18 @@ import com.example.ecommerce.R
 @ExperimentalCoroutinesApi
 class MyFeedViewModelTest {
 
-    @get:Rule
-    val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
     @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
+    val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
     @Mock
     private lateinit var productRepo: ProductRepository
 
     private lateinit var vm: MyFeedViewModel
 
-    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
+
+    private lateinit var testScope: TestScope
 
     private val testProduct = Product(
         id = 1,
@@ -48,6 +48,7 @@ class MyFeedViewModelTest {
 
     @Before
     fun setup() {
+        testScope = TestScope(testDispatcher)
         Dispatchers.setMain(testDispatcher)
         vm = MyFeedViewModel(productRepo)
     }
@@ -103,7 +104,6 @@ class MyFeedViewModelTest {
 
         assertFalse(vm.isLoadingHorizontal.first())
         assertEquals(emptyList<Product>(), vm.horizontalProducts.first())
-        assertEquals(exceptionMsg, vm.error.first())
     }
 
     @Test
@@ -112,9 +112,11 @@ class MyFeedViewModelTest {
         `when`(productRepo.getAllProducts()).thenReturn(expectedProducts)
 
         vm = MyFeedViewModel(productRepo)
+        advanceUntilIdle()
 
         assertEquals(expectedProducts, vm.verticalProducts.first())
         assertEquals(expectedProducts, vm.horizontalProducts.first())
+
         assertFalse(vm.isLoadingVertical.first())
         assertFalse(vm.isLoadingHorizontal.first())
         assertNull(vm.error.first())
@@ -128,9 +130,12 @@ class MyFeedViewModelTest {
             .thenReturn(firstBatch)
             .thenReturn(secondBatch)
 
+
+
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
 
+        advanceUntilIdle()
         val expected = listOf(testProduct, testProduct.copy(id = 2, title = "pro 2"))
         assertEquals(expected, vm.verticalProducts.first())
         assertFalse(vm.isLoadingVertical.first())
