@@ -16,7 +16,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.ecommerce.HiltTestRunner"
     }
 
     buildTypes {
@@ -71,6 +71,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.test:runner:1.6.1")
     androidTestImplementation("androidx.test:rules:1.6.1")
-    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
+    debugImplementation("androidx.fragment:fragment-testing:1.8.8")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.48")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.7")
 }

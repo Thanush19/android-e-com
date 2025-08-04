@@ -13,9 +13,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TempFragmentTest {
 
+
     @Test
     fun checkText() {
-        val scenario = launchFragmentInContainer<TempFragment>()
+        launchFragmentInContainer<TempFragment>()
         onView(withText("hiii")).check(matches(isDisplayed()))
     }
 }
