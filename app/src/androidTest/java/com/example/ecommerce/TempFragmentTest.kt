@@ -12,8 +12,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TempFragmentTest {
-
-
     @Test
     fun checkText() {
         launchFragmentInContainer<TempFragment>()
