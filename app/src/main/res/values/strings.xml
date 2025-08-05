@@ -47,5 +47,6 @@
     <string name="sort_name_asc">Sort by Name (A to Z)</string>
     <string name="sort_name_desc">Sort by Name (Z to A)</string>
     <string name="clear_filter"> Clear filter</string>
+    <string name="back_button_description">go back</string>
 
 </resources>

@@ -62,7 +62,9 @@ class LoginFragment : Fragment() {
                         is AuthState.Success -> {
                             _binding?.progressBar?.visibility = View.GONE
                             _binding?.btnLogin?.isEnabled = true
-                            navigateToHome()
+                            if (findNavController().currentDestination?.id == R.id.loginFragment) {
+                                navigateToHome()
+                            }
                         }
                         is AuthState.Error -> {
                             _binding?.progressBar?.visibility = View.GONE

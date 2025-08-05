@@ -36,7 +36,7 @@
             android:id="@+id/action_registerFragment_to_myFeedFragment"
             app:destination="@id/myFeedFragment"
             app:popUpTo="@id/nav_graph"
-             app:popUpToInclusive="true" />
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -46,7 +46,9 @@
         tools:layout="@layout/fragment_my_feed">
         <action
             android:id="@+id/action_myFeedFragment_to_productDetailsFragment"
-            app:destination="@id/productDetailsFragment" />
+            app:destination="@id/productDetailsFragment"
+            app:popUpTo="@id/myFeedFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
@@ -57,11 +59,11 @@
         <action
             android:id="@+id/action_myProfileFragment_to_productDetailsFragment"
             app:destination="@id/productDetailsFragment"
-            />
+            app:popUpTo="@id/myProfileFragment"
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_myProfileFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-          />
+            app:destination="@id/loginFragment" />
     </fragment>
 
     <fragment
