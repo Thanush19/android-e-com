@@ -86,24 +86,31 @@ class MyFeedFragment : Fragment() {
         binding.ivFilter.setOnClickListener { view ->
             val popupMenu = PopupMenu(requireContext(), view)
             popupMenu.menuInflater.inflate(R.menu.menu_filter, popupMenu.menu)
+
             popupMenu.menu.findItem(R.id.clear_filter)?.isVisible = crntSortOptions != null
+
             popupMenu.setOnMenuItemClickListener { item ->
-                viewLifecycleOwner.lifecycleScope.launch {
-                    when (item.itemId) {
-                        R.id.clear_filter -> {
-                            vm.setSortOption(null)
-                            crntSortOptions = null
-                        }
-                        else -> {
-                            vm.setSortOption(item.itemId)
-                            crntSortOptions = item.itemId
-                        }
+                when (item.itemId) {
+                    R.id.clear_filter -> {
+                        crntSortOptions = null
+                        vm.setSortOption(null)
                     }
-                    applyFilter(crntSortOptions)
+                    else -> {
+                        crntSortOptions = item.itemId
+                        vm.setSortOption(item.itemId)
+                    }
                 }
                 true
             }
             popupMenu.show()
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.sortOption.collectLatest { sortOption ->
+                    crntSortOptions = sortOption
+                    applyFilter(sortOption)
+                }
+            }
         }
     }
 
