@@ -57,7 +57,6 @@ class ProductDetailsFragment : Fragment() {
 
         val productId = args.productId
 
-        // Set up back button click listener
         binding.btnBack.setOnClickListener {
             findNavController().popBackStack()
         }

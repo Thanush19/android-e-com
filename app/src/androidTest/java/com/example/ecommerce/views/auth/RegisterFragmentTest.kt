@@ -6,8 +6,10 @@ import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -21,6 +23,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import com.example.ecommerce.launchFragmentInHiltContainer
+import com.example.ecommerce.views.home.ProductDetailsFragment
+import com.example.ecommerce.views.home.ProductDetailsFragmentArgs
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -73,7 +77,7 @@ class RegisterFragmentTest {
 
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             navController.setGraph(R.navigation.nav_graph)
-            navController.setCurrentDestination(R.id.loginFragment)
+            navController.setCurrentDestination(R.id.registerFragment)
         }
 
         launchFragmentInHiltContainer<RegisterFragment>(
@@ -86,6 +90,7 @@ class RegisterFragmentTest {
         onView(withId(R.id.etPassword)).perform(typeText("123"), closeSoftKeyboard())
         onView(withId(R.id.etConfirmPassword)).perform(typeText("123"), closeSoftKeyboard())
         onView(withId(R.id.btnRegister)).perform(click())
+        assert(navController.currentDestination == null || navController.currentDestination?.id != R.id.registerFragment)
     }
 
     @Test
