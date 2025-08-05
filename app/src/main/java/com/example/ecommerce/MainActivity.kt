@@ -13,6 +13,7 @@ import com.example.ecommerce.databinding.ActivityMainBinding
 import com.example.ecommerce.views.auth.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.activity.viewModels
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -76,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     private fun observeAuthState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                vm.loggedIn.collect { isLoggedIn ->
+                vm.loggedIn.collectLatest { isLoggedIn ->
                     val currentDestination = navController.currentDestination?.id
                     if (isLoggedIn && currentDestination != R.id.myFeedFragment) {
                         navController.navigate(R.id.myFeedFragment)

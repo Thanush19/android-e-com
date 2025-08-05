@@ -30,13 +30,6 @@ class MyProfileFragment : Fragment() {
     private var _binding: FragmentMyProfileBinding? = null
     private val binding get() = _binding!!
     private val vm: MyProfileViewModel by viewModels()
-
-    @Inject
-    lateinit var ordersRepository: OrdersRepository
-
-    @Inject
-    lateinit var productRepository: ProductRepository
-
     private lateinit var orderDropdownAdapter: OrderDropdownAdapter
     private var popupWindow: PopupWindow? = null
 

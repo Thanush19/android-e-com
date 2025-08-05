@@ -17,13 +17,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ecommerce.R
-import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.databinding.FragmentMyFeedBinding
 import com.example.ecommerce.views.adapters.ProductAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyFeedFragment : Fragment() {
@@ -32,8 +30,6 @@ class MyFeedFragment : Fragment() {
     private val binding get() = _binding!!
 
     val vm: MyFeedViewModel by viewModels()
-    @Inject
-    lateinit var userPreferencesRepository: UserPreferencesRepository
     private lateinit var verticalProductAdapter: ProductAdapter
     private lateinit var horizontalProductAdapter: ProductAdapter
     private var crntSortOptions: Int? = null

@@ -54,6 +54,14 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_product_horizontal" />
 
+        <ProgressBar
+            android:id="@+id/horizontalProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="16dp"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/tvFeedTitle"
             android:layout_width="wrap_content"
