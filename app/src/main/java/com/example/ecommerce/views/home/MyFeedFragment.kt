@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
 class MyFeedFragment : Fragment() {
 
@@ -37,6 +38,9 @@ class MyFeedFragment : Fragment() {
     private lateinit var verticalProductAdapter: ProductAdapter
     private lateinit var horizontalProductAdapter: ProductAdapter
     private var crntSortOptions: Int? = null
+    private var lastVerticalFetchTime: Long = 0
+    private var lastHorizontalFetchTime: Long = 0
+    private val debounceDelay = 500L
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -101,43 +105,31 @@ class MyFeedFragment : Fragment() {
             }
             popupMenu.show()
         }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                vm.sortOption.collectLatest { sortOption ->
-                    crntSortOptions = sortOption
-                    applyFilter(sortOption)
-                }
-            }
-        }
     }
 
     fun applyFilter(sortOption: Int?) {
         val verticalProducts = vm.verticalProducts.value
         val horizontalProducts = vm.horizontalProducts.value
 
-        if (verticalProducts.isNotEmpty() || horizontalProducts.isNotEmpty()) {
-            val sortedVerticalProducts = when (sortOption) {
-                R.id.sort_price_asc -> verticalProducts.sortedBy { it.price }
-                R.id.sort_price_desc -> verticalProducts.sortedByDescending { it.price }
-                R.id.sort_name_asc -> verticalProducts.sortedBy { it.title }
-                R.id.sort_name_desc -> verticalProducts.sortedByDescending { it.title }
-                else -> verticalProducts
-            }
-            val sortedHorizontalProducts = when (sortOption) {
-                R.id.sort_price_asc -> horizontalProducts.sortedBy { it.price }
-                R.id.sort_price_desc -> horizontalProducts.sortedByDescending { it.price }
-                R.id.sort_name_asc -> horizontalProducts.sortedBy { it.title }
-                R.id.sort_name_desc -> horizontalProducts.sortedByDescending { it.title }
-                else -> horizontalProducts
-            }
-            verticalProductAdapter.updateProducts(sortedVerticalProducts)
-            horizontalProductAdapter.updateProducts(sortedHorizontalProducts)
-            binding.rvProducts.scrollToPosition(0)
-            binding.rvHorizontalProducts.scrollToPosition(0)
+        val sortedVerticalProducts = when (sortOption) {
+            R.id.sort_price_asc -> verticalProducts.sortedBy { it.price }
+            R.id.sort_price_desc -> verticalProducts.sortedByDescending { it.price }
+            R.id.sort_name_asc -> verticalProducts.sortedBy { it.title }
+            R.id.sort_name_desc -> verticalProducts.sortedByDescending { it.title }
+            else -> verticalProducts
         }
+        val sortedHorizontalProducts = when (sortOption) {
+            R.id.sort_price_asc -> horizontalProducts.sortedBy { it.price }
+            R.id.sort_price_desc -> horizontalProducts.sortedByDescending { it.price }
+            R.id.sort_name_asc -> horizontalProducts.sortedBy { it.title }
+            R.id.sort_name_desc -> horizontalProducts.sortedByDescending { it.title }
+            else -> horizontalProducts
+        }
+        verticalProductAdapter.updateProducts(sortedVerticalProducts)
+        horizontalProductAdapter.updateProducts(sortedHorizontalProducts)
+        binding.rvProducts.scrollToPosition(0)
+        binding.rvHorizontalProducts.scrollToPosition(0)
     }
-
 
     private fun navigateToProductDetails(productId: Int) {
         val action = MyFeedFragmentDirections.actionMyFeedFragmentToProductDetailsFragment(productId)
@@ -150,25 +142,46 @@ class MyFeedFragment : Fragment() {
             val child = nestedScrollView.getChildAt(0)
             val childHeight = child.height
             val scrollViewHeight = nestedScrollView.height
+            val currentTime = System.currentTimeMillis()
 
-            if (!vm.isLoadingVertical.value && scrollY >= childHeight - scrollViewHeight - 200) {
+            if (!vm.isLoadingVertical.value && scrollY >= childHeight - scrollViewHeight - 200 &&
+                currentTime - lastVerticalFetchTime > debounceDelay) {
+                lastVerticalFetchTime = currentTime
                 vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
             }
         }
     }
 
+    private fun setupHorizontalScrollListener() {
+        binding.rvHorizontalProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val scrollOffset = recyclerView.computeHorizontalScrollOffset()
+                val scrollExtent = recyclerView.computeHorizontalScrollExtent()
+                val scrollRange = recyclerView.computeHorizontalScrollRange()
+                val currentTime = System.currentTimeMillis()
+
+                val distanceFromEnd = scrollRange - (scrollOffset + scrollExtent)
+
+                if (!vm.isLoadingHorizontal.value && distanceFromEnd < 200 &&
+                    currentTime - lastHorizontalFetchTime > debounceDelay) {
+                    lastHorizontalFetchTime = currentTime
+                    vm.fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
+                }
+            }
+        })
+    }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     vm.verticalProducts.collect { products ->
-                        applyFilter(crntSortOptions)
+                        verticalProductAdapter.appendProducts(products)
                     }
                 }
                 launch {
                     vm.horizontalProducts.collect { products ->
-                        applyFilter(crntSortOptions)
+                        horizontalProductAdapter.appendProducts(products)
                     }
                 }
                 launch {
@@ -188,24 +201,14 @@ class MyFeedFragment : Fragment() {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private fun setupHorizontalScrollListener() {
-        binding.rvHorizontalProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val scrollOffset = recyclerView.computeHorizontalScrollOffset()
-                val scrollExtent = recyclerView.computeHorizontalScrollExtent()
-                val scrollRange = recyclerView.computeHorizontalScrollRange()
-
-                val distanceFromEnd = scrollRange - (scrollOffset + scrollExtent)
-
-                if (!vm.isLoadingHorizontal.value && distanceFromEnd < 200) {
-                    vm.fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
+                launch {
+                    vm.sortOption.collectLatest { sortOption ->
+                        crntSortOptions = sortOption
+                        applyFilter(sortOption)
+                    }
                 }
             }
-        })
+        }
     }
 
     override fun onDestroyView() {

@@ -11,6 +11,7 @@ import com.example.ecommerce.databinding.ItemProductBinding
 import com.example.ecommerce.databinding.ItemLoaderBinding
 import java.util.Locale
 
+
 class ProductAdapter(
     private val onProductClick: (Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -50,12 +51,29 @@ class ProductAdapter(
         return products.size
     }
 
+    // Modified to append new items instead of replacing the list
+    fun appendProducts(newProducts: List<Product>) {
+        val oldSize = products.size
+        products.addAll(newProducts)
+        notifyItemRangeInserted(oldSize, newProducts.size)
+    }
+
+    // Keep updateProducts for sorting/filtering
     fun updateProducts(newProducts: List<Product>) {
         val diffCallback = ProductDiffCallback(products, newProducts)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         products.clear()
         products.addAll(newProducts)
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    // Enable stable IDs to reduce view re-binding
+    init {
+        setHasStableIds(true)
+    }
+
+    override fun getItemId(position: Int): Long {
+        return products[position].id.toLong()
     }
 
     class ProductViewHolder(

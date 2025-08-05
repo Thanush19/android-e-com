@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class MyFeedViewModel @Inject constructor(
     private val productRepository: ProductRepository
@@ -61,7 +62,7 @@ class MyFeedViewModel @Inject constructor(
                         currentList.addAll(newProducts)
                         _verticalProducts.value = currentList
                     } catch (_: Exception) {
-                        _error.value = "nw err"
+                        _error.value = "Network error"
                     } finally {
                         _isLoadingVertical.value = false
                     }
