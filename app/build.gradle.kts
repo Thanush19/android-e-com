@@ -65,7 +65,14 @@ dependencies {
     implementation(libs.filament.android)
     implementation(libs.androidx.runtime)
     implementation("io.coil-kt:coil:2.5.0")
+
+    // --- Unit test dependencies ---
     testImplementation(libs.junit)
+    testImplementation("org.mockito:mockito-core:5.12.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+
+    // --- Instrumentation test dependencies ---
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

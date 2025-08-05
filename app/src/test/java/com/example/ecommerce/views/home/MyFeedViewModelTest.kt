@@ -1,6 +1,5 @@
 package com.example.ecommerce.views.home
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.ecommerce.data.model.Product
 import com.example.ecommerce.data.model.Rating
 import com.example.ecommerce.data.repository.ProductRepository
