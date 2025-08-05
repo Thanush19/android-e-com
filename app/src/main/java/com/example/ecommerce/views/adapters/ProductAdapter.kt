@@ -51,14 +51,12 @@ class ProductAdapter(
         return products.size
     }
 
-    // Modified to append new items instead of replacing the list
     fun appendProducts(newProducts: List<Product>) {
         val oldSize = products.size
         products.addAll(newProducts)
         notifyItemRangeInserted(oldSize, newProducts.size)
     }
 
-    // Keep updateProducts for sorting/filtering
     fun updateProducts(newProducts: List<Product>) {
         val diffCallback = ProductDiffCallback(products, newProducts)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
@@ -67,7 +65,10 @@ class ProductAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    // Enable stable IDs to reduce view re-binding
+    fun getProducts(): List<Product> {
+        return products.toList()
+    }
+
     init {
         setHasStableIds(true)
     }

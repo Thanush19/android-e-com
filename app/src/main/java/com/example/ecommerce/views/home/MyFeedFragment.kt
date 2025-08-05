@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class MyFeedFragment : Fragment() {
 
@@ -86,9 +85,7 @@ class MyFeedFragment : Fragment() {
         binding.ivFilter.setOnClickListener { view ->
             val popupMenu = PopupMenu(requireContext(), view)
             popupMenu.menuInflater.inflate(R.menu.menu_filter, popupMenu.menu)
-
             popupMenu.menu.findItem(R.id.clear_filter)?.isVisible = crntSortOptions != null
-
             popupMenu.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.clear_filter -> {
@@ -100,6 +97,7 @@ class MyFeedFragment : Fragment() {
                         vm.setSortOption(item.itemId)
                     }
                 }
+                applyFilter(crntSortOptions)
                 true
             }
             popupMenu.show()
@@ -115,8 +113,8 @@ class MyFeedFragment : Fragment() {
     }
 
     fun applyFilter(sortOption: Int?) {
-        val verticalProducts = vm.verticalProducts.value
-        val horizontalProducts = vm.horizontalProducts.value
+        val verticalProducts = verticalProductAdapter.getProducts()
+        val horizontalProducts = horizontalProductAdapter.getProducts()
 
         val sortedVerticalProducts = when (sortOption) {
             R.id.sort_price_asc -> verticalProducts.sortedBy { it.price }
