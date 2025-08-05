@@ -9,12 +9,15 @@ import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.data.repository.OrdersRepository
 import com.example.ecommerce.data.repository.ProductRepository
 import com.example.ecommerce.data.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MyProfileViewModel(
+@HiltViewModel
+class MyProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val ordersRepository: OrdersRepository,

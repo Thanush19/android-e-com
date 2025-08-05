@@ -1,5 +1,6 @@
 package com.example.ecommerce.di
 
+import android.content.Context
 import com.example.ecommerce.data.api.ProductApiService
 import com.example.ecommerce.data.db.dao.OrdersDao
 import com.example.ecommerce.data.db.dao.UserDao
@@ -9,6 +10,7 @@ import com.example.ecommerce.data.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 

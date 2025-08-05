@@ -58,7 +58,6 @@ class ProductAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-
     class ProductViewHolder(
         private val binding: ItemProductBinding,
         private val onProductClick: (Int) -> Unit
