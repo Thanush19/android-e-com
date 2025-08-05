@@ -25,7 +25,7 @@ import com.example.ecommerce.launchFragmentInHiltContainer
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
-class LoginFragmentTest {
+class RegisterFragmentTest {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
@@ -37,74 +37,95 @@ class LoginFragmentTest {
 
     @Test
     fun testAllUiElementsAreDisplayed() {
-        launchFragmentInHiltContainer<LoginFragment>(
+        launchFragmentInHiltContainer<RegisterFragment>(
             factory = FragmentFactory()
         )
-        onView(withId(R.id.tvLoginTitle)).check(matches(isDisplayed()))
-            .check(matches(withText(R.string.login_title)))
+        onView(withId(R.id.tvRegisterTitle)).check(matches(isDisplayed()))
+            .check(matches(withText(R.string.register_title)))
         onView(withId(R.id.tilUsername)).check(matches(isDisplayed()))
         onView(withId(R.id.etUsername)).check(matches(isDisplayed()))
         onView(withId(R.id.tilPassword)).check(matches(isDisplayed()))
         onView(withId(R.id.etPassword)).check(matches(isDisplayed()))
-        onView(withId(R.id.btnLogin)).check(matches(isDisplayed()))
-            .check(matches(withText(R.string.login_button)))
-        onView(withId(R.id.tvRegisterPrompt)).check(matches(isDisplayed()))
-            .check(matches(withText(R.string.register_prompt)))
+        onView(withId(R.id.tilConfirmPassword)).check(matches(isDisplayed()))
+        onView(withId(R.id.etConfirmPassword)).check(matches(isDisplayed()))
+        onView(withId(R.id.btnRegister)).check(matches(isDisplayed()))
+            .check(matches(withText(R.string.register_button)))
+        onView(withId(R.id.tvLoginPrompt)).check(matches(isDisplayed()))
+            .check(matches(withText(R.string.login_prompt)))
         onView(withId(R.id.progressBar)).check(matches(not(isDisplayed())))
     }
 
     @Test
-    fun testLoginButtonClickWithEmptyFieldsShowsError() {
-        launchFragmentInHiltContainer<LoginFragment>(
+    fun testRegisterButtonClickWithEmptyFieldsShowsError() {
+        launchFragmentInHiltContainer<RegisterFragment>(
             factory = FragmentFactory()
         )
-        onView(withId(R.id.btnLogin))
+        onView(withId(R.id.btnRegister))
             .check(matches(isDisplayed()))
             .check(matches(isEnabled()))
             .perform(click())
+
     }
 
     @Test
-    fun testLoginButtonClickWithValidCredentials() {
-        launchFragmentInHiltContainer<LoginFragment>(
-            factory = FragmentFactory()
-        )
-        onView(withId(R.id.etUsername)).perform(typeText("abc"), closeSoftKeyboard())
-        onView(withId(R.id.etPassword)).perform(typeText("123"), closeSoftKeyboard())
-        onView(withId(R.id.btnLogin)).perform(click())
-    }
-
-    @Test
-    fun testRegisterPromptClickNavigatesToRegisterFragment() {
+    fun testRegisterButtonClickWithValidCredentials() {
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             navController.setGraph(R.navigation.nav_graph)
             navController.setCurrentDestination(R.id.loginFragment)
         }
-        launchFragmentInHiltContainer<LoginFragment>(
+
+        launchFragmentInHiltContainer<RegisterFragment>(
+            factory = FragmentFactory()
+        ){
+            Navigation.setViewNavController(this.requireView(), navController)
+        }
+
+        onView(withId(R.id.etUsername)).perform(typeText("abc"), closeSoftKeyboard())
+        onView(withId(R.id.etPassword)).perform(typeText("123"), closeSoftKeyboard())
+        onView(withId(R.id.etConfirmPassword)).perform(typeText("123"), closeSoftKeyboard())
+        onView(withId(R.id.btnRegister)).perform(click())
+    }
+
+    @Test
+    fun testLoginPromptClickNavigatesToLoginFragment() {
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            navController.setGraph(R.navigation.nav_graph)
+            navController.setCurrentDestination(R.id.registerFragment)
+        }
+        launchFragmentInHiltContainer<RegisterFragment>(
             factory = FragmentFactory()
         ) {
             Navigation.setViewNavController(this.requireView(), navController)
         }
-        onView(withId(R.id.tvRegisterPrompt)).perform(click())
-        assert(navController.currentDestination?.id == R.id.registerFragment)
+        onView(withId(R.id.tvLoginPrompt)).perform(click())
+        assert(navController.currentDestination?.id == R.id.loginFragment)
     }
 
     @Test
     fun testPasswordFieldHidesTextByDefault() {
-        launchFragmentInHiltContainer<LoginFragment>(
+        launchFragmentInHiltContainer<RegisterFragment>(
             factory = FragmentFactory()
         )
         onView(withId(R.id.etPassword)).check(matches(withInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)))
     }
 
     @Test
-    fun testInputFieldsClearErrorsWhenTextChanged() {
-        launchFragmentInHiltContainer<LoginFragment>(
+    fun testConfirmPasswordFieldHidesTextByDefault() {
+        launchFragmentInHiltContainer<RegisterFragment>(
             factory = FragmentFactory()
         )
-        onView(withId(R.id.btnLogin)).perform(click())
+        onView(withId(R.id.etConfirmPassword)).check(matches(withInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)))
+    }
+
+    @Test
+    fun testInputFieldsClearErrorsWhenTextChanged() {
+        launchFragmentInHiltContainer<RegisterFragment>(
+            factory = FragmentFactory()
+        )
+        onView(withId(R.id.btnRegister)).perform(click())
         onView(withId(R.id.etUsername)).perform(typeText("a"), closeSoftKeyboard())
     }
 }
