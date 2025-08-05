@@ -94,21 +94,4 @@ class ProductDetailsFragmentTest {
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
-//    @Test
-//    fun testBackButtonNavigatesBack() {
-//        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-//        val bundle = ProductDetailsFragmentArgs(productId = 1).toBundle()
-//        InstrumentationRegistry.getInstrumentation().runOnMainSync {
-//            navController.setGraph(R.navigation.nav_graph)
-//            navController.setCurrentDestination(R.id.productDetailsFragment, bundle)
-//        }
-//        launchFragmentInHiltContainer<ProductDetailsFragment>(
-//            fragmentArgs = bundle,
-//            factory = FragmentFactory()
-//        ) {
-//            Navigation.setViewNavController(this.requireView(), navController)
-//        }
-//        onView(ViewMatchers.withId(R.id.btnBack)).perform(ViewActions.click())
-//        assert(navController.currentDestination == null || navController.currentDestination?.id != R.id.productDetailsFragment)
-//    }
 }
