@@ -46,7 +46,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    implementation(libs.androidx.junit.ktx)
     kapt(libs.room.compiler)
     implementation(libs.datastore.preferences)
     implementation(libs.datastore.core)
@@ -59,28 +58,45 @@ dependencies {
     implementation(libs.lifecycle.runtime)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
-    implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-android-compiler:2.48")
-    implementation("androidx.hilt:hilt-navigation-fragment:1.1.0")
-    implementation(libs.filament.android)
-    implementation(libs.androidx.runtime)
-    implementation("io.coil-kt:coil:2.5.0")
+    implementation("com.google.dagger:hilt-android:2.51")
+    kapt("com.google.dagger:hilt-compiler:2.51")
+    implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
+    implementation("io.coil-kt:coil:2.7.0")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
 
-    // --- Unit test dependencies ---
+    // Unit test dependencies
     testImplementation(libs.junit)
-    testImplementation("org.mockito:mockito-core:5.12.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
+    testImplementation("org.mockito:mockito-core:5.14.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("androidx.test.ext:junit:1.2.1")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("androidx.room:room-testing:2.6.1")
+    testImplementation("com.google.code.gson:gson:2.11.0")
+    testImplementation("com.google.dagger:hilt-android-testing:2.51")
+    kaptTest("com.google.dagger:hilt-compiler:2.51")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.24")
 
-    // --- Instrumentation test dependencies ---
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    // Android test dependencies
+    androidTestImplementation("androidx.test:core:1.6.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation("androidx.test:runner:1.6.1")
+    androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test:rules:1.6.1")
-    debugImplementation("androidx.fragment:fragment-testing:1.8.8")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.48")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.48")
     androidTestImplementation("androidx.navigation:navigation-testing:2.7.7")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.8.0")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.6.1")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51")
+    kaptAndroidTest("com.google.dagger:hilt-compiler:2.51")
+    debugImplementation("androidx.fragment:fragment-testing:1.8.4")
+}
+
+// Force consistent version for androidx.test:core
+configurations.all {
+    resolutionStrategy {
+        force("androidx.test:core:1.6.1")
+    }
 }
