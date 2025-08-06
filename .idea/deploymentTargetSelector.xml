@@ -5,19 +5,16 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="LoginFragmentTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="testAllUiElementsAreDisplayed()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testLoginButtonClickWithInvalidCredentialsShowsError()">
+      <SelectionState runConfigName="ProductDetailsFragmentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testLoginButtonDisabledDuringLoadingState()">
+      <SelectionState runConfigName="testLoginPromptClickNavigatesToLoginFragment()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="checkText()">
+      <SelectionState runConfigName="MyProfileFragmentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
