@@ -69,9 +69,6 @@ class ProductAdapter(
         return products.toList()
     }
 
-    init {
-        setHasStableIds(true)
-    }
 
     override fun getItemId(position: Int): Long {
         return products[position].id.toLong()
@@ -95,7 +92,7 @@ class ProductAdapter(
         }
     }
 
-    class LoaderViewHolder(private val binding: ItemLoaderBinding) : RecyclerView.ViewHolder(binding.root) {
+    class LoaderViewHolder(binding: ItemLoaderBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind() {}
     }
 

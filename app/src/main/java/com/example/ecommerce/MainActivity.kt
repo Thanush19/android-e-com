@@ -13,6 +13,7 @@ import com.example.ecommerce.databinding.ActivityMainBinding
 import com.example.ecommerce.views.auth.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.activity.viewModels
+import com.example.ecommerce.views.home.MyFeedFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -42,21 +43,20 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.myFeedFragment -> {
-                    navController.navigate(R.id.myFeedFragment)
-                    true
+                    if (navController.currentDestination?.id == R.id.myFeedFragment) {
+                        val fragment = supportFragmentManager
+                            .findFragmentById(R.id.fragmentContainer)
+                            ?.childFragmentManager
+                            ?.fragments
+                            ?.find { it is MyFeedFragment } as? MyFeedFragment
+                        fragment?.scrollToTop()
+                        true
+                    } else {
+                        navController.navigate(R.id.myFeedFragment)
+                        true
+                    }
                 }
                 else -> false
-            }
-        }
-
-        binding.bottomNavigation.setOnItemReselectedListener { item ->
-            when (item.itemId) {
-                R.id.myProfileFragment -> {
-                    navController.popBackStack(R.id.myProfileFragment, false)
-                }
-                R.id.myFeedFragment -> {
-                    navController.popBackStack(R.id.myFeedFragment, false)
-                }
             }
         }
 

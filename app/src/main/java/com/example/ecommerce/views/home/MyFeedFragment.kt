@@ -33,9 +33,6 @@ class MyFeedFragment : Fragment() {
     private lateinit var verticalProductAdapter: ProductAdapter
     private lateinit var horizontalProductAdapter: ProductAdapter
     private var crntSortOptions: Int? = null
-    private var lastVerticalFetchTime: Long = 0
-    private var lastHorizontalFetchTime: Long = 0
-    private val debounceDelay = 500L
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,21 +56,16 @@ class MyFeedFragment : Fragment() {
         horizontalProductAdapter = ProductAdapter { productId ->
             navigateToProductDetails(productId)
         }
-
         verticalProductAdapter = ProductAdapter { productId ->
             navigateToProductDetails(productId)
         }
-
         binding.rvHorizontalProducts.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = horizontalProductAdapter
-            isNestedScrollingEnabled = false
         }
-
         binding.rvProducts.apply {
             layoutManager = GridLayoutManager(requireContext(), 1)
             adapter = verticalProductAdapter
-            isNestedScrollingEnabled = false
         }
     }
 
@@ -112,22 +104,23 @@ class MyFeedFragment : Fragment() {
         val verticalProducts = verticalProductAdapter.getProducts()
         val horizontalProducts = horizontalProductAdapter.getProducts()
 
-        val sortedVerticalProducts = when (sortOption) {
+        val sortedVertical = when (sortOption) {
             R.id.sort_price_asc -> verticalProducts.sortedBy { it.price }
             R.id.sort_price_desc -> verticalProducts.sortedByDescending { it.price }
             R.id.sort_name_asc -> verticalProducts.sortedBy { it.title }
             R.id.sort_name_desc -> verticalProducts.sortedByDescending { it.title }
             else -> verticalProducts
         }
-        val sortedHorizontalProducts = when (sortOption) {
+        val sortedHorizontal = when (sortOption) {
             R.id.sort_price_asc -> horizontalProducts.sortedBy { it.price }
             R.id.sort_price_desc -> horizontalProducts.sortedByDescending { it.price }
             R.id.sort_name_asc -> horizontalProducts.sortedBy { it.title }
             R.id.sort_name_desc -> horizontalProducts.sortedByDescending { it.title }
             else -> horizontalProducts
         }
-        verticalProductAdapter.updateProducts(sortedVerticalProducts)
-        horizontalProductAdapter.updateProducts(sortedHorizontalProducts)
+
+        verticalProductAdapter.updateProducts(sortedVertical)
+        horizontalProductAdapter.updateProducts(sortedHorizontal)
         binding.rvProducts.scrollToPosition(0)
         binding.rvHorizontalProducts.scrollToPosition(0)
     }
@@ -143,11 +136,8 @@ class MyFeedFragment : Fragment() {
             val child = nestedScrollView.getChildAt(0)
             val childHeight = child.height
             val scrollViewHeight = nestedScrollView.height
-            val currentTime = System.currentTimeMillis()
 
-            if (!vm.isLoadingVertical.value && scrollY >= childHeight - scrollViewHeight - 200 &&
-                currentTime - lastVerticalFetchTime > debounceDelay) {
-                lastVerticalFetchTime = currentTime
+            if (!vm.isLoadingVertical.value && scrollY >= childHeight - scrollViewHeight - 200) {
                 vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
             }
         }
@@ -159,13 +149,10 @@ class MyFeedFragment : Fragment() {
                 val scrollOffset = recyclerView.computeHorizontalScrollOffset()
                 val scrollExtent = recyclerView.computeHorizontalScrollExtent()
                 val scrollRange = recyclerView.computeHorizontalScrollRange()
-                val currentTime = System.currentTimeMillis()
 
                 val distanceFromEnd = scrollRange - (scrollOffset + scrollExtent)
 
-                if (!vm.isLoadingHorizontal.value && distanceFromEnd < 200 &&
-                    currentTime - lastHorizontalFetchTime > debounceDelay) {
-                    lastHorizontalFetchTime = currentTime
+                if (!vm.isLoadingHorizontal.value && distanceFromEnd < 200) {
                     vm.fetchAllProducts(MyFeedViewModel.LayoutType.HORIZONTAL)
                 }
             }
@@ -210,6 +197,10 @@ class MyFeedFragment : Fragment() {
                 }
             }
         }
+    }
+
+    fun scrollToTop() {
+        binding.nestedScrollView.smoothScrollTo(0, 0)
     }
 
     override fun onDestroyView() {

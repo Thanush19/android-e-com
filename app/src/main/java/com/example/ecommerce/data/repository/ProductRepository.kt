@@ -7,7 +7,7 @@ class ProductRepository(private val productApiService: ProductApiService) {
     suspend fun getAllProducts(): List<Product>? {
         return try {
             productApiService.getAllProducts().body()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

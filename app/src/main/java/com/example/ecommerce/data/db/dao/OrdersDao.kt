@@ -1,4 +1,3 @@
-// OrdersDao.kt
 package com.example.ecommerce.data.db.dao
 
 import androidx.room.*

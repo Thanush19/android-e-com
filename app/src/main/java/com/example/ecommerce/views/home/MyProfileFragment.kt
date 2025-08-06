@@ -86,8 +86,6 @@ class MyProfileFragment : Fragment() {
                     }
                     showOrdersDropdown(products)
                 }
-            } ?: run {
-                Toast.makeText(context, getString(R.string.login_to_view_orders), Toast.LENGTH_SHORT).show()
             }
         }
 
