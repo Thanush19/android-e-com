@@ -67,16 +67,16 @@ class UserRepositoryIntegrationTest {
 
     @Test
     fun `login user with invalid name`() = runTest {
-        val user = userRepository.loginUser("nonexistent")
+        val user = userRepository.loginUser("abcde")
         assertNull(user)
     }
 
     @Test
     fun `get user id`() = runTest {
-        val userId = userRepository.registerUser("testuser", "password")
+        val userId = userRepository.registerUser("abc", "123")
         val user = userRepository.getUserById(userId!!)
         assertNotNull(user)
-        assertEquals("testuser", user?.userName)
+        assertEquals("abc", user?.userName)
     }
 
     @Test

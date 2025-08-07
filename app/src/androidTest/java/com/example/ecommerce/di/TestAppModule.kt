@@ -72,5 +72,5 @@
         fun provideOrdersRepository(ordersDao: OrdersDao): OrdersRepository {
             return OrdersRepository(ordersDao)
         }
-        
+
     }
