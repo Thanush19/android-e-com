@@ -40,39 +40,39 @@ class UserRepositoryIntegrationTest {
     }
 
     @Test
-    fun testRegisterUser_success() = runTest {
-        val userId = userRepository.registerUser("testuser", "password")
+    fun `register user and success `() = runTest {
+        val userId = userRepository.registerUser("abc", "123")
         assertNotNull(userId)
 
         val user = userRepository.getUserById(userId!!)
         assertNotNull(user)
-        assertEquals("testuser", user?.userName)
-        assertEquals("password", user?.password)
+        assertEquals("abc", user?.userName)
+        assertEquals("123", user?.password)
     }
 
     @Test
-    fun testRegisterUser_duplicateUserName() = runTest {
-        userRepository.registerUser("testuser", "password")
-        val userId = userRepository.registerUser("testuser", "newpassword")
+    fun `register user with existing username`() = runTest {
+        userRepository.registerUser("abc", "123")
+        val userId = userRepository.registerUser("abc", "123")
         assertNull(userId)
     }
 
     @Test
-    fun testLoginUser_success() = runTest {
-        userRepository.registerUser("testuser", "password")
-        val user = userRepository.loginUser("testuser")
+    fun `login user success`() = runTest {
+        userRepository.registerUser("abc", "123")
+        val user = userRepository.loginUser("abc")
         assertNotNull(user)
-        assertEquals("testuser", user?.userName)
+        assertEquals("abc", user?.userName)
     }
 
     @Test
-    fun testLoginUser_invalidUserName() = runTest {
+    fun `login user with invalid name`() = runTest {
         val user = userRepository.loginUser("nonexistent")
         assertNull(user)
     }
 
     @Test
-    fun testGetUserById_success() = runTest {
+    fun `get user id`() = runTest {
         val userId = userRepository.registerUser("testuser", "password")
         val user = userRepository.getUserById(userId!!)
         assertNotNull(user)
@@ -80,7 +80,7 @@ class UserRepositoryIntegrationTest {
     }
 
     @Test
-    fun testGetUserById_invalidId() = runTest {
+    fun `get userId for invalid userId`() = runTest {
         val user = userRepository.getUserById(999L)
         assertNull(user)
     }

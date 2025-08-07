@@ -5,6 +5,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
@@ -43,21 +44,21 @@ class ProductDetailsFragmentTest {
             fragmentArgs = bundle,
             factory = FragmentFactory()
         )
-        Espresso.onView(ViewMatchers.withId(R.id.tvProductTitle))
+        onView(ViewMatchers.withId(R.id.tvProductTitle))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.tvProductPrice))
+        onView(ViewMatchers.withId(R.id.tvProductPrice))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.tvProductDescription))
+        onView(ViewMatchers.withId(R.id.tvProductDescription))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.tvProductCategory))
+        onView(ViewMatchers.withId(R.id.tvProductCategory))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.tvProductRating))
+        onView(ViewMatchers.withId(R.id.tvProductRating))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.ivProductImage))
+        onView(ViewMatchers.withId(R.id.ivProductImage))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnBack))
+        onView(ViewMatchers.withId(R.id.btnBack))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.btnBuyNow))
+        onView(ViewMatchers.withId(R.id.btnBuyNow))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -75,14 +76,14 @@ class ProductDetailsFragmentTest {
         ) {
             Navigation.setViewNavController(this.requireView(), navController)
         }
-        Espresso.onView(ViewMatchers.withId(R.id.btnBuyNow)).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withText(R.string.confirm_purchase_title))
+        onView(ViewMatchers.withId(R.id.btnBuyNow)).perform(ViewActions.click())
+        onView(ViewMatchers.withText(R.string.confirm_purchase_title))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withText(R.string.confirm_purchase_message))
+        onView(ViewMatchers.withText(R.string.confirm_purchase_message))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withText(R.string.buy_now))
+        onView(ViewMatchers.withText(R.string.buy_now))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withText(R.string.cancel))
+        onView(ViewMatchers.withText(R.string.cancel))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
@@ -103,8 +104,7 @@ class ProductDetailsFragmentTest {
         ) {
             Navigation.setViewNavController(this.requireView(), navController)
         }
-
-        Espresso.onView(ViewMatchers.withId(R.id.btnBack)).perform(ViewActions.click())
+        onView(ViewMatchers.withId(R.id.btnBack)).perform(ViewActions.click())
         assert(navController.currentDestination?.id != R.id.productDetailsFragment)
     }
 

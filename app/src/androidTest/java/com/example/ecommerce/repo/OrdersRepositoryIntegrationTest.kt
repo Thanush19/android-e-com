@@ -32,20 +32,20 @@ class OrdersRepositoryIntegrationTest {
     lateinit var userDao: UserDao
 
     @Inject
-    lateinit var repository: OrdersRepository
+    lateinit var repo: OrdersRepository
 
     @Before
     fun setUp() = runTest {
         hiltRule.inject()
-        userDao.insertUser(User( 1L,   "User1", "user1@example.com"))
-        userDao.insertUser(User(2L, "User2","user2@example.com"))
+        userDao.insertUser(User( 1L,   "u1", "u1@gmail.com"))
+        userDao.insertUser(User(2L, "u2","u2@gmail.com"))
     }
 
     @Test
-    fun placeOrder_insertsOrderAndReturnsOrderId() = runTest {
+    fun `placeOrder insert order and return orderId`() = runTest {
         val order = Order(userId = 1L, productIds = listOf(1, 2))
 
-        val orderId = repository.placeOrder(order)
+        val orderId = repo.placeOrder(order)
 
         assertNotNull(orderId)
         val orders = ordersDao.getOrdersByUser(1L).first()
@@ -53,22 +53,22 @@ class OrdersRepositoryIntegrationTest {
     }
 
     @Test
-    fun getOrdersByUser_returnsOrdersForGivenUserId() = runTest {
-        val order1 = Order(userId = 1L, productIds = listOf(1, 2))
-        val order2 = Order(userId = 1L, productIds = listOf(3))
-        val order3 = Order(userId = 2L, productIds = listOf(4))
-        ordersDao.insertOrder(order1)
-        ordersDao.insertOrder(order2)
-        ordersDao.insertOrder(order3)
+    fun `get OrdersByUser returnsOrders For GivenUserId`() = runTest {
+        val o1 = Order(userId = 1L, productIds = listOf(1, 2))
+        val o2 = Order(userId = 1L, productIds = listOf(3))
+        val o3 = Order(userId = 2L, productIds = listOf(4))
+        ordersDao.insertOrder(o1)
+        ordersDao.insertOrder(o2)
+        ordersDao.insertOrder(o3)
 
-        val orders = repository.getOrdersByUser(1L).first()
+        val orders = repo.getOrdersByUser(1L).first()
         assertEquals(2, orders.size)
         assertEquals(listOf(1L, 1L), orders.map { it.userId })
     }
 
     @Test
-    fun getOrdersByUser_returnsEmptyListForNonExistentUserId() = runTest {
-        val orders = repository.getOrdersByUser(999L).first()
+    fun `get OrdersByUser  returns EmptyList For NonExistent UserId`() = runTest {
+        val orders = repo.getOrdersByUser(999L).first()
         assertEquals(emptyList<Order>(), orders)
     }
 }

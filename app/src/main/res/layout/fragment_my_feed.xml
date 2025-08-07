@@ -52,7 +52,7 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_product_horizontal" />
+            tools:listitem="@layout/item_product" />
 
         <ProgressBar
             android:id="@+id/horizontalProgressBar"

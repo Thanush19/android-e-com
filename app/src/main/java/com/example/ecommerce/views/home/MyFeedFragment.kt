@@ -64,7 +64,7 @@ class MyFeedFragment : Fragment() {
             adapter = horizontalProductAdapter
         }
         binding.rvProducts.apply {
-            layoutManager = GridLayoutManager(requireContext(), 1)
+            layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = verticalProductAdapter
         }
     }

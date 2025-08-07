@@ -72,26 +72,5 @@
         fun provideOrdersRepository(ordersDao: OrdersDao): OrdersRepository {
             return OrdersRepository(ordersDao)
         }
-
-        @Provides
-        @Singleton
-        fun provideMockWebServer(): MockWebServer {
-            return MockWebServer()
-        }
-
-        @Provides
-        @Singleton
-        fun provideProductApiService(mockWebServer: MockWebServer): ProductApiService {
-            val retrofit = Retrofit.Builder()
-                .baseUrl(mockWebServer.url("/"))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-            return retrofit.create(ProductApiService::class.java)
-        }
-
-        @Provides
-        @Singleton
-        fun provideProductRepository(productApiService: ProductApiService): ProductRepository {
-            return ProductRepository(productApiService)
-        }
+        
     }

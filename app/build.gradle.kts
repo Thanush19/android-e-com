@@ -64,7 +64,6 @@ dependencies {
     implementation("io.coil-kt:coil:2.7.0")
     kapt("androidx.hilt:hilt-compiler:1.2.0")
 
-    // Unit test dependencies
     testImplementation(libs.junit)
     testImplementation("org.mockito:mockito-core:5.14.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
@@ -79,7 +78,6 @@ dependencies {
     kaptTest("com.google.dagger:hilt-compiler:2.51")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.24")
 
-    // Android test dependencies
     androidTestImplementation("androidx.test:core:1.6.1")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -91,7 +89,6 @@ dependencies {
     kaptAndroidTest("com.google.dagger:hilt-compiler:2.51")
     debugImplementation("androidx.fragment:fragment-testing:1.8.4")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
-
 }
 
 configurations.all {

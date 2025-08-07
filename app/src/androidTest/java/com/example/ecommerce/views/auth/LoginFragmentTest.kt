@@ -40,6 +40,7 @@ class LoginFragmentTest {
         launchFragmentInHiltContainer<LoginFragment>(
             factory = FragmentFactory()
         )
+
         onView(withId(R.id.tvLoginTitle)).check(matches(isDisplayed()))
             .check(matches(withText(R.string.login_title)))
         onView(withId(R.id.tilUsername)).check(matches(isDisplayed()))

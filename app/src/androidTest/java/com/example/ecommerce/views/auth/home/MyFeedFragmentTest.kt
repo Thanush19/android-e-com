@@ -2,19 +2,13 @@ package com.example.ecommerce.views.auth.home
 
 
 import androidx.fragment.app.FragmentFactory
-import androidx.navigation.Navigation
-import androidx.navigation.testing.TestNavHostController
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ecommerce.R
 import com.example.ecommerce.launchFragmentInHiltContainer
-import com.example.ecommerce.views.adapters.ProductAdapter
 import com.example.ecommerce.views.home.MyFeedFragment
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
