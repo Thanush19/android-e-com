@@ -1,26 +1,25 @@
 package com.example.ecommerce.repo
 
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
-import com.example.ecommerce.data.db.LocalDB
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.ecommerce.data.db.dao.OrdersDao
+import com.example.ecommerce.data.db.dao.UserDao
 import com.example.ecommerce.data.db.entity.Order
+import com.example.ecommerce.data.db.entity.User
+import com.example.ecommerce.data.repository.OrdersRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
+import org.junit.runner.RunWith
 import javax.inject.Inject
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import com.example.ecommerce.data.repository.OrdersRepository
-
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 
 @HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
 class OrdersRepositoryIntegrationTest {
 
     @get:Rule
@@ -30,27 +29,20 @@ class OrdersRepositoryIntegrationTest {
     lateinit var ordersDao: OrdersDao
 
     @Inject
-    lateinit var repository:OrdersRepository
+    lateinit var userDao: UserDao
 
     @Inject
-     lateinit var database: LocalDB
+    lateinit var repository: OrdersRepository
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         hiltRule.inject()
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            LocalDB::class.java
-        ).allowMainThreadQueries().build()
-    }
-
-    @After
-    fun tearDown() {
-        database.close()
+        userDao.insertUser(User( 1L,   "User1", "user1@example.com"))
+        userDao.insertUser(User(2L, "User2","user2@example.com"))
     }
 
     @Test
-    fun `placeOrder inserts order and returns order ID`() = runTest {
+    fun placeOrder_insertsOrderAndReturnsOrderId() = runTest {
         val order = Order(userId = 1L, productIds = listOf(1, 2))
 
         val orderId = repository.placeOrder(order)
@@ -61,7 +53,7 @@ class OrdersRepositoryIntegrationTest {
     }
 
     @Test
-    fun `getOrdersByUser returns orders for given user ID`() = runTest {
+    fun getOrdersByUser_returnsOrdersForGivenUserId() = runTest {
         val order1 = Order(userId = 1L, productIds = listOf(1, 2))
         val order2 = Order(userId = 1L, productIds = listOf(3))
         val order3 = Order(userId = 2L, productIds = listOf(4))
@@ -75,8 +67,8 @@ class OrdersRepositoryIntegrationTest {
     }
 
     @Test
-    fun `getOrdersByUser returns empty list for non-existent user ID`() = runTest {
+    fun getOrdersByUser_returnsEmptyListForNonExistentUserId() = runTest {
         val orders = repository.getOrdersByUser(999L).first()
-        assertEquals(emptyList(), orders)
+        assertEquals(emptyList<Order>(), orders)
     }
 }

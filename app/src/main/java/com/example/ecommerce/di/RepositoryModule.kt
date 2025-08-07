@@ -24,7 +24,7 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideOrderstRepository(ordersDao: OrdersDao): OrdersRepository {
+    fun provideOrdersRepository(ordersDao: OrdersDao): OrdersRepository {
         return OrdersRepository(ordersDao)
     }
 

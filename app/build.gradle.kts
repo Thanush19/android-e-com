@@ -72,6 +72,7 @@ dependencies {
     testImplementation("androidx.test:core:1.6.1")
     testImplementation("androidx.test.ext:junit:1.2.1")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation("androidx.room:room-testing:2.6.1")
     testImplementation("com.google.code.gson:gson:2.11.0")
     testImplementation("com.google.dagger:hilt-android-testing:2.51")
@@ -89,9 +90,10 @@ dependencies {
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.51")
     kaptAndroidTest("com.google.dagger:hilt-compiler:2.51")
     debugImplementation("androidx.fragment:fragment-testing:1.8.4")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+
 }
 
-// Force consistent version for androidx.test:core
 configurations.all {
     resolutionStrategy {
         force("androidx.test:core:1.6.1")
