@@ -1,0 +1,125 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OrdersRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.ecommerce.data.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: OrdersRepository (com.example.ecommerce.data.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OrdersRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.ecommerce.data.repository
+&nbsp;
+&nbsp;import com.example.ecommerce.data.db.dao.OrdersDao
+&nbsp;import com.example.ecommerce.data.db.entity.Order
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;
+<b class="nc">&nbsp;class OrdersRepository(private val ordersDao: OrdersDao) {</b>
+&nbsp;
+&nbsp;    suspend fun placeOrder(order: Order): Long {
+<b class="nc">&nbsp;        return ordersDao.insertOrder(order)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    fun getOrdersByUser(userId: Long): Flow&lt;List&lt;Order&gt;&gt; {
+&nbsp;        return try {
+<b class="nc">&nbsp;            ordersDao.getOrdersByUser(userId)</b>
+&nbsp;        } catch (_: Exception) {
+<b class="nc">&nbsp;            flowOf(emptyList())</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-08-10 21:53</div>
+</div>
+</body>
+</html>

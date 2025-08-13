@@ -19,13 +19,10 @@ import org.junit.Assert.assertNull
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class UserRepositoryIntegrationTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
-
     @Inject
     lateinit var userRepository: UserRepository
-
     @Inject
     lateinit var database: LocalDB
 
@@ -33,7 +30,6 @@ class UserRepositoryIntegrationTest {
     fun setup() {
         hiltRule.inject()
     }
-
     @After
     fun tearDown() {
         database.close()

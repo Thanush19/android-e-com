@@ -2,8 +2,9 @@ package com.example.ecommerce.data.repository
 
 import com.example.ecommerce.data.api.ProductApiService
 import com.example.ecommerce.data.model.Product
+import javax.inject.Inject
 
-class ProductRepository(private val productApiService: ProductApiService) {
+class ProductRepository @Inject constructor(private val productApiService: ProductApiService) {
     suspend fun getAllProducts(): List<Product>? {
         return try {
             productApiService.getAllProducts().body()

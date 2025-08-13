@@ -2,8 +2,9 @@ package com.example.ecommerce.data.repository
 
 import com.example.ecommerce.data.db.dao.UserDao
 import com.example.ecommerce.data.db.entity.User
+import javax.inject.Inject
 
-class UserRepository(private val userDao: UserDao) {
+class UserRepository @Inject constructor(private val userDao: UserDao) {
     suspend fun registerUser(userName: String, password: String): Long? {
         val existingUser = userDao.getUserByUserName(userName)
         if (existingUser != null) {

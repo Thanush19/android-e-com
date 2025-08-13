@@ -15,17 +15,15 @@ import org.mockito.kotlin.*
 import org.junit.Assert.*
 import kotlinx.coroutines.test.StandardTestDispatcher
 import org.mockito.Mock
-import org.mockito.junit.MockitoJUnit
+import org.mockito.junit.MockitoJUnit.rule
 import org.mockito.junit.MockitoRule
 
 @ExperimentalCoroutinesApi
 class AuthViewModelTest {
-
     @get:Rule
-    val mockitoRule: MockitoRule = MockitoJUnit.rule()
+    val mockitoRule: MockitoRule = rule()
 
     private lateinit var vm: AuthViewModel
-
     @Mock
     private lateinit var userRepository: UserRepository
 
@@ -163,7 +161,6 @@ class AuthViewModelTest {
         assertEquals(AuthState.Loading, vm.registerState.value)
         advanceUntilIdle()
         assertEquals(AuthState.Error("Registration failed: Database error"), vm.registerState.value)
-
     }
 }
 

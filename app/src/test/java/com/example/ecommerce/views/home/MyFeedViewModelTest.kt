@@ -14,9 +14,9 @@ import org.junit.Test
 import org.junit.Assert.*
 import org.mockito.Mock
 import org.mockito.Mockito.*
-import org.mockito.junit.MockitoJUnit
 import org.mockito.junit.MockitoRule
 import com.example.ecommerce.R
+import org.mockito.junit.MockitoJUnit.rule
 
 
 @ExperimentalCoroutinesApi
@@ -24,16 +24,15 @@ class MyFeedViewModelTest {
 
 
     @get:Rule
-    val mockitoRule: MockitoRule = MockitoJUnit.rule()
+    val mockitoRule: MockitoRule = rule()
 
     @Mock
     private lateinit var productRepo: ProductRepository
 
+    @Mock
     private lateinit var vm: MyFeedViewModel
 
     private val testDispatcher = StandardTestDispatcher()
-
-    private lateinit var testScope: TestScope
 
     private val testProduct = Product(
         id = 1,
@@ -47,7 +46,6 @@ class MyFeedViewModelTest {
 
     @Before
     fun setup() {
-        testScope = TestScope(testDispatcher)
         Dispatchers.setMain(testDispatcher)
         vm = MyFeedViewModel(productRepo)
     }

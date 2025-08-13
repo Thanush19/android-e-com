@@ -1,0 +1,309 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProductAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.ecommerce.views.adapters</a>
+</div>
+
+<h1>Coverage Summary for Class: ProductAdapter (com.example.ecommerce.views.adapters)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProductAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ProductAdapter$Companion</td>
+  </tr>
+  <tr>
+    <td class="name">ProductAdapter$LoaderViewHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ProductAdapter$ProductDiffCallback</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ProductAdapter$ProductViewHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.ecommerce.views.adapters
+&nbsp;
+&nbsp;import android.view.LayoutInflater
+&nbsp;import android.view.ViewGroup
+&nbsp;import androidx.recyclerview.widget.DiffUtil
+&nbsp;import androidx.recyclerview.widget.RecyclerView
+&nbsp;import coil.load
+&nbsp;import com.example.ecommerce.R
+&nbsp;import com.example.ecommerce.data.model.Product
+&nbsp;import com.example.ecommerce.databinding.ItemProductBinding
+&nbsp;import com.example.ecommerce.databinding.ItemLoaderBinding
+&nbsp;import java.util.Locale
+&nbsp;
+&nbsp;
+&nbsp;class ProductAdapter(
+<b class="nc">&nbsp;    private val onProductClick: (Int) -&gt; Unit</b>
+<b class="nc">&nbsp;) : RecyclerView.Adapter&lt;RecyclerView.ViewHolder&gt;() {</b>
+&nbsp;
+<b class="nc">&nbsp;    private val products: MutableList&lt;Product&gt; = mutableListOf()</b>
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        private const val VIEW_TYPE_PRODUCT = 0
+&nbsp;        private const val VIEW_TYPE_LOADER = 1
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun getItemViewType(position: Int): Int {
+<b class="nc">&nbsp;        return VIEW_TYPE_PRODUCT</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+<b class="nc">&nbsp;        return when (viewType) {</b>
+<b class="nc">&nbsp;            VIEW_TYPE_LOADER -&gt; {</b>
+<b class="nc">&nbsp;                val binding = ItemLoaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)</b>
+<b class="nc">&nbsp;                LoaderViewHolder(binding)</b>
+&nbsp;            }
+&nbsp;            else -&gt; {
+<b class="nc">&nbsp;                val binding = ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)</b>
+<b class="nc">&nbsp;                ProductViewHolder(binding, onProductClick)</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+<b class="nc">&nbsp;        when (holder) {</b>
+<b class="nc">&nbsp;            is ProductViewHolder -&gt; holder.bind(products[position])</b>
+<b class="nc">&nbsp;            is LoaderViewHolder -&gt; holder.bind()</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun getItemCount(): Int {
+<b class="nc">&nbsp;        return products.size</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    fun appendProducts(newProducts: List&lt;Product&gt;) {
+<b class="nc">&nbsp;        val oldSize = products.size</b>
+<b class="nc">&nbsp;        products.addAll(newProducts)</b>
+<b class="nc">&nbsp;        notifyItemRangeInserted(oldSize, newProducts.size)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    fun updateProducts(newProducts: List&lt;Product&gt;) {
+<b class="nc">&nbsp;        val diffCallback = ProductDiffCallback(products, newProducts)</b>
+<b class="nc">&nbsp;        val diffResult = DiffUtil.calculateDiff(diffCallback)</b>
+<b class="nc">&nbsp;        products.clear()</b>
+<b class="nc">&nbsp;        products.addAll(newProducts)</b>
+<b class="nc">&nbsp;        diffResult.dispatchUpdatesTo(this)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    fun getProducts(): List&lt;Product&gt; {
+<b class="nc">&nbsp;        return products.toList()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    override fun getItemId(position: Int): Long {
+<b class="nc">&nbsp;        return products[position].id.toLong()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    class ProductViewHolder(
+<b class="nc">&nbsp;        private val binding: ItemProductBinding,</b>
+<b class="nc">&nbsp;        private val onProductClick: (Int) -&gt; Unit</b>
+<b class="nc">&nbsp;    ) : RecyclerView.ViewHolder(binding.root) {</b>
+&nbsp;        fun bind(product: Product) {
+<b class="nc">&nbsp;            binding.tvProductName.text = product.title</b>
+<b class="nc">&nbsp;            binding.tvProductPrice.text = binding.root.context.getString(</b>
+<b class="nc">&nbsp;                R.string.product_price, String.format(Locale.US, &quot;%.2f&quot;, product.price)</b>
+&nbsp;            )
+<b class="nc">&nbsp;            binding.ivProductImage.load(product.image) {</b>
+<b class="nc">&nbsp;                crossfade(true)</b>
+<b class="nc">&nbsp;                placeholder(android.R.drawable.ic_menu_gallery)</b>
+<b class="nc">&nbsp;                error(android.R.drawable.ic_menu_report_image)</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            binding.root.setOnClickListener { onProductClick(product.id) }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    class LoaderViewHolder(binding: ItemLoaderBinding) : RecyclerView.ViewHolder(binding.root) {</b>
+<b class="nc">&nbsp;        fun bind() {}</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    class ProductDiffCallback(
+<b class="nc">&nbsp;        private val oldList: List&lt;Product&gt;,</b>
+<b class="nc">&nbsp;        private val newList: List&lt;Product&gt;</b>
+<b class="nc">&nbsp;    ) : DiffUtil.Callback() {</b>
+<b class="nc">&nbsp;        override fun getOldListSize(): Int = oldList.size</b>
+<b class="nc">&nbsp;        override fun getNewListSize(): Int = newList.size</b>
+&nbsp;        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+<b class="nc">&nbsp;            oldList[oldItemPosition].id == newList[newItemPosition].id</b>
+&nbsp;        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+<b class="nc">&nbsp;            oldList[oldItemPosition] == newList[newItemPosition]</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-08-10 21:53</div>
+</div>
+</body>
+</html>

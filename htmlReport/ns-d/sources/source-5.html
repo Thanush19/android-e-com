@@ -1,0 +1,297 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MyFeedViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.ecommerce.views.home</a>
+</div>
+
+<h1>Coverage Summary for Class: MyFeedViewModel (com.example.ecommerce.views.home)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MyFeedViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (24/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MyFeedViewModel$fetchAllProducts$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MyFeedViewModel$fetchAllProducts$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MyFeedViewModel$LayoutType</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MyFeedViewModel$WhenMappings</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.6%
+  </span>
+  <span class="absValue">
+    (41/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.ecommerce.views.home
+&nbsp;
+&nbsp;import androidx.lifecycle.ViewModel
+&nbsp;import androidx.lifecycle.viewModelScope
+&nbsp;import com.example.ecommerce.data.model.Product
+&nbsp;import com.example.ecommerce.data.repository.ProductRepository
+&nbsp;import dagger.hilt.android.lifecycle.HiltViewModel
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import kotlinx.coroutines.flow.asStateFlow
+&nbsp;import kotlinx.coroutines.launch
+&nbsp;import javax.inject.Inject
+&nbsp;
+&nbsp;
+&nbsp;@HiltViewModel
+&nbsp;class MyFeedViewModel @Inject constructor(
+<b class="fc">&nbsp;    private val productRepository: ProductRepository</b>
+<b class="fc">&nbsp;) : ViewModel() {</b>
+&nbsp;
+<b class="fc">&nbsp;    private val _verticalProducts = MutableStateFlow&lt;List&lt;Product&gt;&gt;(emptyList())</b>
+<b class="fc">&nbsp;    val verticalProducts: StateFlow&lt;List&lt;Product&gt;&gt; = _verticalProducts.asStateFlow()</b>
+&nbsp;
+<b class="fc">&nbsp;    private val _horizontalProducts = MutableStateFlow&lt;List&lt;Product&gt;&gt;(emptyList())</b>
+<b class="fc">&nbsp;    val horizontalProducts: StateFlow&lt;List&lt;Product&gt;&gt; = _horizontalProducts.asStateFlow()</b>
+&nbsp;
+<b class="fc">&nbsp;    private val _isLoadingVertical = MutableStateFlow(false)</b>
+<b class="fc">&nbsp;    val isLoadingVertical: StateFlow&lt;Boolean&gt; = _isLoadingVertical.asStateFlow()</b>
+&nbsp;
+<b class="fc">&nbsp;    private val _isLoadingHorizontal = MutableStateFlow(false)</b>
+<b class="fc">&nbsp;    val isLoadingHorizontal: StateFlow&lt;Boolean&gt; = _isLoadingHorizontal.asStateFlow()</b>
+&nbsp;
+<b class="fc">&nbsp;    private val _error = MutableStateFlow&lt;String?&gt;(null)</b>
+<b class="fc">&nbsp;    val error: StateFlow&lt;String?&gt; = _error.asStateFlow()</b>
+&nbsp;
+<b class="fc">&nbsp;    private val _sortOption = MutableStateFlow&lt;Int?&gt;(null)</b>
+<b class="fc">&nbsp;    val sortOption: StateFlow&lt;Int?&gt; = _sortOption.asStateFlow()</b>
+&nbsp;
+<b class="fc">&nbsp;    init {</b>
+<b class="fc">&nbsp;        fetchAllProducts(LayoutType.VERTICAL)</b>
+<b class="fc">&nbsp;        fetchAllProducts(LayoutType.HORIZONTAL)</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    enum class LayoutType {
+<b class="fc">&nbsp;        VERTICAL,</b>
+<b class="fc">&nbsp;        HORIZONTAL</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    fun setSortOption(sortOption: Int?) {
+<b class="fc">&nbsp;        _sortOption.value = sortOption</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    fun fetchAllProducts(layoutType: LayoutType) {
+<b class="fc">&nbsp;        when (layoutType) {</b>
+&nbsp;            LayoutType.VERTICAL -&gt; {
+<b class="pc">&nbsp;                if (_isLoadingVertical.value) return</b>
+<b class="fc">&nbsp;                viewModelScope.launch {</b>
+<b class="fc">&nbsp;                    _isLoadingVertical.value = true</b>
+<b class="fc">&nbsp;                    _error.value = null</b>
+&nbsp;                    try {
+<b class="fc">&nbsp;                        val newProducts = productRepository.getAllProducts() ?: emptyList()</b>
+<b class="fc">&nbsp;                        val currentList = _verticalProducts.value.toMutableList()</b>
+<b class="fc">&nbsp;                        currentList.addAll(newProducts)</b>
+<b class="fc">&nbsp;                        _verticalProducts.value = currentList</b>
+&nbsp;                    } catch (_: Exception) {
+<b class="nc">&nbsp;                        _error.value = &quot;Network error&quot;</b>
+&nbsp;                    } finally {
+<b class="fc">&nbsp;                        _isLoadingVertical.value = false</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;            LayoutType.HORIZONTAL -&gt; {
+<b class="fc">&nbsp;                if (_isLoadingHorizontal.value) return</b>
+<b class="fc">&nbsp;                viewModelScope.launch {</b>
+<b class="fc">&nbsp;                    _isLoadingHorizontal.value = true</b>
+<b class="fc">&nbsp;                    _error.value = null</b>
+&nbsp;                    try {
+<b class="fc">&nbsp;                        val newProducts = productRepository.getAllProducts() ?: emptyList()</b>
+<b class="fc">&nbsp;                        val currentList = _horizontalProducts.value.toMutableList()</b>
+<b class="fc">&nbsp;                        currentList.addAll(newProducts)</b>
+<b class="fc">&nbsp;                        _horizontalProducts.value = currentList</b>
+&nbsp;                    } catch (e: Exception) {
+<b class="fc">&nbsp;                        _error.value = e.message</b>
+&nbsp;                    } finally {
+<b class="fc">&nbsp;                        _isLoadingHorizontal.value = false</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-08-10 21:53</div>
+</div>
+</body>
+</html>

@@ -4,6 +4,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.kapt")
+    id("jacoco")
 }
 
 android {
@@ -20,9 +21,12 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        getByName("debug") {
+            enableUnitTestCoverage = true
         }
     }
 
@@ -35,6 +39,13 @@ android {
     }
     buildFeatures {
         viewBinding = true
+    }
+}
+
+tasks.withType<Test> {
+    extensions.configure(JacocoTaskExtension::class) {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
     }
 }
 
@@ -89,6 +100,7 @@ dependencies {
     kaptAndroidTest("com.google.dagger:hilt-compiler:2.51")
     debugImplementation("androidx.fragment:fragment-testing:1.8.4")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation(kotlin("test"))
 }
 
 configurations.all {
