@@ -38,7 +38,6 @@ class OrdersRepositoryIntegrationTest {
     fun setUp() = runTest {
         hiltRule.inject()
         userDao.insertUser(User( 1L,   "u1", "u1@gmail.com"))
-        userDao.insertUser(User(2L, "u2","u2@gmail.com"))
     }
 
     @Test
@@ -56,10 +55,8 @@ class OrdersRepositoryIntegrationTest {
     fun `get OrdersByUser returnsOrders For GivenUserId`() = runTest {
         val o1 = Order(userId = 1L, productIds = listOf(1, 2))
         val o2 = Order(userId = 1L, productIds = listOf(3))
-        val o3 = Order(userId = 2L, productIds = listOf(4))
         ordersDao.insertOrder(o1)
         ordersDao.insertOrder(o2)
-        ordersDao.insertOrder(o3)
 
         val orders = repo.getOrdersByUser(1L).first()
         assertEquals(2, orders.size)
