@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
-import com.example.ecommerce.data.api.ProductApiService
 import com.example.ecommerce.data.db.LocalDB
 import com.example.ecommerce.data.db.dao.OrdersDao
 import com.example.ecommerce.data.db.dao.UserDao
@@ -23,16 +22,14 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [DatabaseModule::class, RepositoryModule::class, PreferencesModule::class, NetworkModule::class]
+    replaces = [DatabaseModule::class, PreferencesModule::class]
 )
 object TestAppModule {
 
         @Provides
         @Singleton
         fun provideDatabase(@ApplicationContext context: Context): LocalDB {
-            return Room.inMemoryDatabaseBuilder(context, LocalDB::class.java)
-                .allowMainThreadQueries()
-                .build()
+            return Room.inMemoryDatabaseBuilder(context, LocalDB::class.java).build()
         }
 
     @Provides
@@ -56,7 +53,6 @@ object TestAppModule {
     fun provideUserPreferencesRepository(@ApplicationContext context: Context): UserPreferencesRepository {
         return UserPreferencesRepository(context)
     }
-
     @Provides
     @Singleton
     fun provideUserRepository(userDao: UserDao): UserRepository {

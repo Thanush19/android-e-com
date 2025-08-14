@@ -29,7 +29,6 @@ class MyFeedViewModelTest {
     @Mock
     private lateinit var productRepo: ProductRepository
 
-    @Mock
     private lateinit var vm: MyFeedViewModel
 
     private val testDispatcher = StandardTestDispatcher()
@@ -126,8 +125,6 @@ class MyFeedViewModelTest {
         `when`(productRepo.getAllProducts())
             .thenReturn(firstBatch)
             .thenReturn(secondBatch)
-
-
 
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
         vm.fetchAllProducts(MyFeedViewModel.LayoutType.VERTICAL)
