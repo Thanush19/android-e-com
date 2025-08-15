@@ -1,11 +1,11 @@
 package com.example.ecommerce.repo
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.ecommerce.data.db.dao.OrdersDao
 import com.example.ecommerce.data.db.dao.UserDao
 import com.example.ecommerce.data.db.entity.Order
 import com.example.ecommerce.data.db.entity.User
 import com.example.ecommerce.data.repository.OrdersRepository
+import com.example.ecommerce.fake.FakeOrdersRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.first
@@ -26,9 +26,6 @@ class OrdersRepositoryIntegrationTest {
     var hiltRule = HiltAndroidRule(this)
 
     @Inject
-    lateinit var ordersDao: OrdersDao
-
-    @Inject
     lateinit var userDao: UserDao
 
     @Inject
@@ -37,7 +34,7 @@ class OrdersRepositoryIntegrationTest {
     @Before
     fun setUp() = runTest {
         hiltRule.inject()
-        userDao.insertUser(User( 1L,   "u1", "u1@gmail.com"))
+        userDao.insertUser(User(id = 1L, userName = "u1", password = "u1@gmail.com"))
     }
 
     @Test
@@ -47,7 +44,7 @@ class OrdersRepositoryIntegrationTest {
         val orderId = repo.placeOrder(order)
 
         assertNotNull(orderId)
-        val orders = ordersDao.getOrdersByUser(1L).first()
+        val orders = repo.getOrdersByUser(1L).first()
         assertEquals(listOf(order.copy(id = orderId)), orders)
     }
 
@@ -55,8 +52,8 @@ class OrdersRepositoryIntegrationTest {
     fun `get OrdersByUser returnsOrders For GivenUserId`() = runTest {
         val o1 = Order(userId = 1L, productIds = listOf(1, 2))
         val o2 = Order(userId = 1L, productIds = listOf(3))
-        ordersDao.insertOrder(o1)
-        ordersDao.insertOrder(o2)
+        repo.placeOrder(o1)
+        repo.placeOrder(o2)
 
         val orders = repo.getOrdersByUser(1L).first()
         assertEquals(2, orders.size)
@@ -64,7 +61,7 @@ class OrdersRepositoryIntegrationTest {
     }
 
     @Test
-    fun `get OrdersByUser  returns EmptyList For NonExistent UserId`() = runTest {
+    fun `get OrdersByUser returns EmptyList For NonExistent UserId`() = runTest {
         val orders = repo.getOrdersByUser(999L).first()
         assertEquals(emptyList<Order>(), orders)
     }

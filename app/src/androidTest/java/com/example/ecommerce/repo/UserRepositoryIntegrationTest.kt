@@ -3,6 +3,7 @@ package com.example.ecommerce.repo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.ecommerce.data.db.LocalDB
 import com.example.ecommerce.data.repository.UserRepository
+import com.example.ecommerce.fake.FakeUserRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.test.runTest
