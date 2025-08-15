@@ -6,17 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
-class OrdersRepository @Inject constructor(private val ordersDao: OrdersDao) {
+interface OrdersRepository  {
 
-    suspend fun placeOrder(order: Order): Long {
-        return ordersDao.insertOrder(order)
-    }
-
-    fun getOrdersByUser(userId: Long): Flow<List<Order>> {
-        return try {
-            ordersDao.getOrdersByUser(userId)
-        } catch (_: Exception) {
-            flowOf(emptyList())
-        }
-    }
+    suspend fun placeOrder(order: Order): Long
+    fun getOrdersByUser(userId: Long): Flow<List<Order>>
 }
+

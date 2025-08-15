@@ -12,9 +12,11 @@ import com.example.ecommerce.data.db.dao.OrdersDao
 import com.example.ecommerce.data.db.dao.UserDao
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
 import com.example.ecommerce.data.repository.OrdersRepository
+import com.example.ecommerce.data.impl.OrdersRepositoryImpl
 import com.example.ecommerce.data.repository.ProductRepository
+import com.example.ecommerce.data.impl.ProductRepositoryImpl
 import com.example.ecommerce.data.repository.UserRepository
-import com.example.ecommerce.data.repository.UserRepositoryImpl
+import com.example.ecommerce.data.impl.UserRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,7 +32,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private const val BASE_URL = "https://fakestoreapi.com/"
+    const val BASE_URL = "https://fakestoreapi.com/"
 
     @Provides
     @Singleton
@@ -87,13 +89,13 @@ object AppModule {
     @Provides
     @Singleton
     fun provideOrdersRepository(ordersDao: OrdersDao): OrdersRepository {
-        return OrdersRepository(ordersDao)
+        return OrdersRepositoryImpl(ordersDao)
     }
 
     @Provides
     @Singleton
     fun provideProductRepository(productApiService: ProductApiService): ProductRepository {
-        return ProductRepository(productApiService)
+        return ProductRepositoryImpl(productApiService)
     }
 
     @Provides

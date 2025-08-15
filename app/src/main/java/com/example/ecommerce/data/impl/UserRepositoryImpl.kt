@@ -1,7 +1,8 @@
-package com.example.ecommerce.data.repository
+package com.example.ecommerce.data.impl
 
 import com.example.ecommerce.data.db.dao.UserDao
 import com.example.ecommerce.data.db.entity.User
+import com.example.ecommerce.data.repository.UserRepository
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
