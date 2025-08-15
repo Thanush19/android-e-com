@@ -10,8 +10,6 @@ import com.example.ecommerce.data.db.LocalDB
 import com.example.ecommerce.data.db.dao.OrdersDao
 import com.example.ecommerce.data.db.dao.UserDao
 import com.example.ecommerce.data.preferences.UserPreferencesRepository
-import com.example.ecommerce.data.repository.OrdersRepository
-import com.example.ecommerce.data.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -26,11 +24,11 @@ import javax.inject.Singleton
 )
 object TestAppModule {
 
-        @Provides
-        @Singleton
-        fun provideDatabase(@ApplicationContext context: Context): LocalDB {
-            return Room.inMemoryDatabaseBuilder(context, LocalDB::class.java).build()
-        }
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): LocalDB {
+        return Room.inMemoryDatabaseBuilder(context, LocalDB::class.java).build()
+    }
 
     @Provides
     @Singleton
@@ -52,16 +50,5 @@ object TestAppModule {
     @Singleton
     fun provideUserPreferencesRepository(@ApplicationContext context: Context): UserPreferencesRepository {
         return UserPreferencesRepository(context)
-    }
-    @Provides
-    @Singleton
-    fun provideUserRepository(userDao: UserDao): UserRepository {
-        return UserRepository(userDao)
-    }
-
-    @Provides
-    @Singleton
-    fun provideOrdersRepository(ordersDao: OrdersDao): OrdersRepository {
-        return OrdersRepository(ordersDao)
     }
 }
